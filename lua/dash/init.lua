@@ -38,6 +38,7 @@ local function picker()
     local stderr = result.stderr
 
     if stdout ~= nil then
+      print(vim.inspect(transformItems(parseResults(stdout))))
       return transformItems(parseResults(stdout))
     end
 
@@ -98,8 +99,8 @@ function M.test(query)
   end
 end
 
-function M.search(query)
-  picker(query)
+function M.search()
+  picker()
 end
 
 return M
