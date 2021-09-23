@@ -8,18 +8,20 @@ local function parseResults(xmlString)
   return handler.root.output or {}
 end
 
-local function transformItems(itemsTable)
+local function transformItems(output)
   local items = {}
-  for _, itemsNode in pairs(itemsTable) do
-    for _, itemList in pairs(itemsNode) do
-      for _, item in pairs(itemList) do
-        if item and item.subtitle then
-          table.insert(items, item.subtitle[#item.subtitle])
-        end
+  if not output.items then
+    return {}
+  end
+  for _, item in pairs(output.items) do
+    if not item._attr then
+      for _, subitem in pairs(item) do
+        table.insert(items, { subitem.subtitle[#subitem.subtitle], subitem._attr.uid })
       end
+    else
+      table.insert(items, { item.subtitle[#item.subtitle], item._attr.uid })
     end
   end
-  print(vim.inspect(items))
   return items
 end
 
@@ -65,8 +67,14 @@ local function picker()
 
   local finder = finders.new_dynamic({
     fn = finderFn,
+    entry_maker = function(entry)
+      return {
+        value = entry,
+        display = entry[1],
+        ordinal = entry[1],
+      }
+    end,
     on_complete = {},
-    debounce = 5000,
   })
 
   pickers
@@ -95,6 +103,21 @@ local function picker()
       end,
     })
     :find()
+end
+
+function M.test(query)
+  local utils = require('dash.utils')
+  local result = utils.runSearch(query)
+  local stdout = result.stdout
+  local stderr = result.stderr
+
+  if stdout ~= nil then
+    return transformItems(parseResults(stdout))
+  end
+
+  if stderr ~= nil then
+    print(stderr)
+  end
 end
 
 function M.search(query)
