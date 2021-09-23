@@ -8,17 +8,31 @@ local function parseResults(xmlString)
   return handler.root.output or {}
 end
 
+local function isArray(any)
+  return type(any) == 'table' and #any > 0 and next(any, #any) == nil
+end
+
 local function transformItems(output)
   local items = {}
-  if not output.items then
+  local sourceItems = output.items
+
+  if not sourceItems then
+    sourceItems = output
+  end
+
+  if not sourceItems then
+    print('failed to parse XML')
     return {}
   end
-  for _, item in pairs(output.items) do
+
+  for _, item in pairs(sourceItems) do
     if not item._attr then
       for _, subitem in pairs(item) do
-        table.insert(items, { subitem.subtitle[#subitem.subtitle], subitem._attr.uid })
+        if subitem._attr then
+          table.insert(items, { subitem.subtitle[#subitem.subtitle], subitem._attr.uid })
+        end
       end
-    else
+    elseif type(item) == 'table' then
       table.insert(items, { item.subtitle[#item.subtitle], item._attr.uid })
     end
   end
@@ -38,7 +52,6 @@ local function picker()
     local stderr = result.stderr
 
     if stdout ~= nil then
-      print(vim.inspect(transformItems(parseResults(stdout))))
       return transformItems(parseResults(stdout))
     end
 
