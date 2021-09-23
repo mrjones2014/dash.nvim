@@ -22,23 +22,8 @@ local function transformItems(output)
       table.insert(items, { item.subtitle[#item.subtitle], item._attr.uid })
     end
   end
+  print(#items)
   return items
-end
-
-local function itemNames(items)
-  local names = {}
-  for _, item in items do
-    table.insert(names, item[1])
-  end
-  return names
-end
-
-local function findUidByName(items, name)
-  for _, item in items do
-    if item[1] == name then
-      return item[2]
-    end
-  end
 end
 
 local function picker()
@@ -85,20 +70,12 @@ local function picker()
       attach_mappings = function(_, map)
         map('i', '<CR>', function(buffnr)
           local entry = require('telescope.actions').get_selected_entry()
+          if not entry then
+            return
+          end
           local utils = require('dash.utils')
           utils.openUid(entry.value)
-          --[[ local name = entry[1]
-          if not name then
-            return
-          end
-          local uid = findUidByName(name)
-          if uid == nil then
-            print('No such item with name ' .. name)
-            require('telescope.actions').close(buffnr)
-            return
-          end
-
-          require('dash.utils').openUid(uid) ]]
+          require('telescope.actions').close(buffnr)
         end)
         return true
       end,
