@@ -30,6 +30,10 @@ function M.runSearch(query)
   }
 end
 
+function M.openUid(uid)
+  vim.cmd('!open ' .. uid)
+end
+
 function M.joinListToString(output)
   if not (type(output) == 'table') then
     return output
