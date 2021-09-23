@@ -1,8 +1,6 @@
 local M = {}
 
-local basePath = os.getenv('HOME') .. '/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows'
-local workflowPath = basePath .. '/user.workflow.5543FE45-6F33-4CDA-BC36-496472725DB2'
-local cliPath = workflowPath .. '/dashAlfredWorkflow'
+local cliPath = '/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow'
 
 function M.runSearch(query)
   local Job = require('plenary.job')
@@ -12,7 +10,7 @@ function M.runSearch(query)
     :new({
       command = cliPath,
       args = { query },
-      cwd = workflowPath,
+      cwd = vim.fn.getcwd(),
       enabled_recording = true,
       on_exit = function(j, return_val)
         if return_val .. '' == '0' then

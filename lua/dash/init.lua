@@ -53,7 +53,6 @@ local function picker()
     local stderr = result.stderr
 
     if stdout ~= nil then
-      print(vim.inspect(transformItems(parseResults(stdout))))
       return transformItems(parseResults(stdout))
     end
 
