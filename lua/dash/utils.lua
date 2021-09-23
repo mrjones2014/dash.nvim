@@ -31,7 +31,14 @@ function M.runSearch(query)
 end
 
 function M.openUid(uid)
-  vim.cmd('!open ' .. uid)
+  local Job = require('plenary.job')
+
+  Job
+    :new({
+      command = 'open',
+      args = { uid },
+    })
+    :start()
 end
 
 function M.joinListToString(output)

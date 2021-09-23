@@ -53,6 +53,7 @@ local function picker()
     local stderr = result.stderr
 
     if stdout ~= nil then
+      print(vim.inspect(transformItems(parseResults(stdout))))
       return transformItems(parseResults(stdout))
     end
 
@@ -69,7 +70,7 @@ local function picker()
     fn = finderFn,
     entry_maker = function(entry)
       return {
-        value = entry,
+        value = entry[2],
         display = entry[1],
         ordinal = entry[1],
       }
@@ -85,7 +86,8 @@ local function picker()
       attach_mappings = function(_, map)
         map('i', '<CR>', function(buffnr)
           local entry = require('telescope.actions').get_selected_entry()
-          print(vim.inspect(entry))
+          local utils = require('dash.utils')
+          utils.openUid(entry.value)
           --[[ local name = entry[1]
           if not name then
             return
