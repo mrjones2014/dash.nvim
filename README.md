@@ -9,7 +9,7 @@ Query Dash.app within Neovim with a Telescope picker!
 Using Packer:
 
 ```lua
-use({ 'mrjones2014/dash.nvim', requires = 'nvim-lua/plenary.nvim', rocks = { 'xml2lua' } })
+use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' }, rocks = { 'xml2lua' } })
 ```
 
 ## Usage
