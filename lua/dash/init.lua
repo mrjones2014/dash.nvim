@@ -51,6 +51,9 @@ local function picker()
   local sorters = require('telescope.sorters')
 
   local finderFn = function(prompt)
+    if not prompt or #prompt == 0 then
+      return {}
+    end
     local utils = require('dash.utils')
     local result = utils.runSearch(prompt)
     local stdout = result.stdout
