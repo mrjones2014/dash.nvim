@@ -52,7 +52,10 @@ local function picker()
   local finders = require('telescope.finders')
   local sorters = require('telescope.sorters')
 
+  local searchText = ''
+
   local finderFn = function(prompt)
+    searchText = prompt
     if not prompt or #prompt == 0 then
       return {}
     end
@@ -98,7 +101,7 @@ local function picker()
             return
           end
           local utils = require('dash.utils')
-          utils.openUid(entry.value)
+          utils.openQuery(searchText)
           require('telescope.actions').close(buffnr)
         end)
         return true
