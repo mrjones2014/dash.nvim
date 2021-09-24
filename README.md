@@ -1,8 +1,10 @@
 # Dash.nvim
 
-Query Dash.app within Neovim with a Telescope picker!
+Query [Dash.app](https://kapeli.com/dash) within Neovim with a Telescope picker!
 
 ![demo](./images/demo.gif)
+
+Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Install
 
