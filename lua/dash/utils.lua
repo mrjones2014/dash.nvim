@@ -28,13 +28,27 @@ function M.runSearch(query)
   }
 end
 
+local char_to_hex = function(c)
+  return string.format('%%%02X', string.byte(c))
+end
+
+local function urlencode(url)
+  if url == nil then
+    return
+  end
+  url = url:gsub('\n', '\r\n')
+  url = string.gsub(url, '([^%w _ %- . ~])', char_to_hex)
+  url = url:gsub(' ', '+')
+  return url
+end
+
 function M.openQuery(query)
   local Job = require('plenary.job')
 
   Job
     :new({
       command = 'open',
-      args = { '-g', ('dash-workflow-callback://' .. query) },
+      args = { '-g', ('dash-workflow-callback://' .. urlencode(query)) },
     })
     :start()
 end
