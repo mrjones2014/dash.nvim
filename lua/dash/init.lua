@@ -1,11 +1,24 @@
 local M = {}
 
+local function flatten(items)
+  local flattened = {}
+  for _, item in pairs(items) do
+    for _, subitem in pairs(item) do
+      table.insert(flattened, subitem)
+    end
+  end
+  return flattened
+end
+
 local function parseResults(xmlString)
   local xml = require('xml2lua')
   local handler = require('xmlhandler.tree')
   local parser = xml.parser(handler)
   parser:parse(xmlString)
-  return handler.root.output or {}
+  if handler.root.output and handler.root.output.items then
+    return flatten(handler.root.output.items)
+  end
+  return {}
 end
 
 local function isArray(any)
@@ -14,29 +27,21 @@ end
 
 local function transformItems(output)
   local items = {}
-  local sourceItems = output.items
 
-  if not sourceItems then
-    sourceItems = output
-  end
-
-  if not sourceItems then
-    print('failed to parse XML')
-    return {}
-  end
-
-  for _, item in pairs(sourceItems) do
-    if not item._attr then
-      for _, subitem in pairs(item) do
-        if subitem._attr then
-          table.insert(items, { subitem.subtitle[#subitem.subtitle], subitem._attr.uid })
+  for _, item in pairs(output) do
+    if type(item) == 'table' and item.title then
+      local title = item.title
+      local value = item._attr.uid
+      if item.subtitle then
+        if type(item.subtitle) == 'table' then
+          title = title .. ' - ' .. item.subtitle[#item.subtitle]
+        else
+          title = title .. ' - ' .. item.subtitle
         end
       end
-    elseif type(item) == 'table' then
-      table.insert(items, { item.subtitle[#item.subtitle], item._attr.uid })
+      table.insert(items, { title, value })
     end
   end
-  print(#items)
   return items
 end
 
