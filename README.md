@@ -1,5 +1,9 @@
 # Dash.nvim
 
+Query Dash.app within Neovim with a Telescope picker!
+
+![demo](./images/demo.gif)
+
 ## Install
 
 Using Packer:
