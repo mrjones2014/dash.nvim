@@ -14,4 +14,4 @@ use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim', 'nv
 
 ## Usage
 
-Show the picker with `require('dash').search()`
+Show the picker with `:Dash` or `require('dash').search()`
