@@ -24,9 +24,23 @@ local function parseResults(xmlString)
   return {}
 end
 
+local function getMainTextValue(item)
+  local value = item.text
+  if type(value) ~= 'table' then
+    return value
+  end
+
+  for _, textValue in pairs(item) do
+    if textValue._attr and textValue._attr.type == 'copy' then
+      return textValue[1]
+    end
+  end
+  return item.title
+end
+
 local function transformSingleItem(item)
   local title = item.title
-  local value = item._attr.uid
+  local value = getMainTextValue(item)
   if item.subtitle then
     if type(item.subtitle) == 'table' then
       title = title .. ': ' .. item.subtitle[#item.subtitle]
@@ -52,10 +66,7 @@ local function picker()
   local finders = require('telescope.finders')
   local sorters = require('telescope.sorters')
 
-  local searchText = ''
-
   local finderFn = function(prompt)
-    searchText = prompt
     if not prompt or #prompt == 0 then
       return {}
     end
@@ -101,7 +112,7 @@ local function picker()
             return
           end
           local utils = require('dash.utils')
-          utils.openQuery(searchText)
+          utils.openQuery(entry.value)
           require('telescope.actions').close(buffnr)
         end)
         return true
