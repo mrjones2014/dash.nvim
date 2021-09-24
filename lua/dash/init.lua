@@ -12,34 +12,36 @@ end
 
 local function parseResults(xmlString)
   local xml = require('xml2lua')
-  local handler = require('xmlhandler.tree')
+  local handler = require('xmlhandler.tree'):new()
   local parser = xml.parser(handler)
   parser:parse(xmlString)
   if handler.root.output and handler.root.output.items then
+    if handler.root.output.items.item and handler.root.output.items.item.title then
+      return { handler.root.output.items.item }
+    end
     return flatten(handler.root.output.items)
   end
   return {}
 end
 
-local function isArray(any)
-  return type(any) == 'table' and #any > 0 and next(any, #any) == nil
+local function transformSingleItem(item)
+  local title = item.title
+  local value = item._attr.uid
+  if item.subtitle then
+    if type(item.subtitle) == 'table' then
+      title = title .. ': ' .. item.subtitle[#item.subtitle]
+    else
+      title = title .. ': ' .. item.subtitle
+    end
+  end
+  return { title, value }
 end
 
 local function transformItems(output)
   local items = {}
-
   for _, item in pairs(output) do
     if type(item) == 'table' and item.title then
-      local title = item.title
-      local value = item._attr.uid
-      if item.subtitle then
-        if type(item.subtitle) == 'table' then
-          title = title .. ' - ' .. item.subtitle[#item.subtitle]
-        else
-          title = title .. ' - ' .. item.subtitle
-        end
-      end
-      table.insert(items, { title, value })
+      table.insert(items, transformSingleItem(item))
     end
   end
   return items
