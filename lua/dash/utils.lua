@@ -28,13 +28,13 @@ function M.runSearch(query)
   }
 end
 
-function M.openUid(uid)
+function M.openQuery(query)
   local Job = require('plenary.job')
 
   Job
     :new({
       command = 'open',
-      args = { uid },
+      args = { '-g', ('dash-workflow-callback://' .. query) },
     })
     :start()
 end
