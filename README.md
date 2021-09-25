@@ -42,7 +42,7 @@ tests, that´s why they are installed as git submodules.
 To run tests, run `make test`. This runs tests in Neovim with a minimal profile,
 [spec.vim](./spec/spec.vim). This runs Neovim with only this plugin, and the testing dependencies.
 
-If you have [entr(1)][https://eradman.com/entrproject/] installed, you can run the tests in watch mode
+If you have [entr(1)](https://eradman.com/entrproject/) installed, you can run the tests in watch mode
 using `make watch`.
 
 ### Code Style
