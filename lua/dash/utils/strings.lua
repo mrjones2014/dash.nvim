@@ -23,7 +23,7 @@ function M.joinListToString(output)
   for _, val in pairs(output) do
     str = str .. val .. '\n'
   end
-  return str
+  return M.trimTrailingNewlines(str)
 end
 
 function M.trimTrailingNewlines(str)
