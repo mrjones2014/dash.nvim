@@ -159,8 +159,7 @@ end
 ---Gets the first key of a given table
 local function getFirstKey(tb)
   if type(tb) == 'table' then
-    -- luacheck: ignore
-    for k, _ in pairs(tb) do
+    for k, _ in pairs(tb) do -- luacheck: ignore
       return k
     end
     return nil
