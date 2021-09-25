@@ -27,3 +27,16 @@ to specify your home directory. For example:
 ```lua
 require('dash').setup({ dashAppPath = (os.getenv('HOME') .. '/Applications/Dash.app') })
 ```
+
+---
+
+## Contributing
+
+### Running Tests
+
+Tests This uses [busted][busted], [luassert][luassert] (both through
+[plenary.nvim][plenary]) and [matcher_combinators][matcher_combinators] to
+define tests in `spec/` directory. These dependencies are required only to run
+tests, that´s why they are installed as git submodules. Additionally, `xml2lua`,
+which is a dependency that should be installed via `luarocks`, is installed
+as a git submodule for use in the test environment.
