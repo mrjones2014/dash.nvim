@@ -39,8 +39,12 @@ Tests This uses [busted][busted], [luassert][luassert] (both through
 define tests in `spec/` directory. These dependencies are required only to run
 tests, that´s why they are installed as git submodules.
 
-To run tests, run `make test`. This runs
-tests in Neovim with a minimal profile
+To run tests, run `make test`. This runs tests in Neovim with a minimal profile,
+[spec.vim](./spec/spec.vim). This runs Neovim with only this plugin, and the testing dependencies.
 
 If you have [entr(1)][entr] installed, you can run the tests in watch mode
 using `make watch`.
+
+### Code Style
+
+Use `cameCase` for everything. Other than that, running `luacheck` and `stylua` should cover it.
