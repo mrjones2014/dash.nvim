@@ -1,3 +1,5 @@
+![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg)
+
 # Dash.nvim
 
 Query [Dash.app](https://kapeli.com/dash) within Neovim with a Telescope picker!
