@@ -48,8 +48,8 @@ function M.transformItems(output)
 end
 
 function M.parse(xmlString)
-  local xml = require('xml2lua')
-  local handler = require('xmlhandler.tree'):new()
+  local xml = require('dash.utils.xml2lua')
+  local handler = require('dash.utils.xml2lua.xmlhandler.tree'):new()
   local parser = xml.parser(handler)
   parser:parse(xmlString)
   if handler.root.output and handler.root.output.items then

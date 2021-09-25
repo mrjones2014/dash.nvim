@@ -15,7 +15,7 @@ Show the picker with `:Dash` or `require('dash').search()`
 Using Packer:
 
 ```lua
-use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' }, rocks = { 'xml2lua' } })
+use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' } })
 ```
 
 ## Configuration
@@ -37,6 +37,4 @@ require('dash').setup({ dashAppPath = (os.getenv('HOME') .. '/Applications/Dash.
 Tests This uses [busted][busted], [luassert][luassert] (both through
 [plenary.nvim][plenary]) and [matcher_combinators][matcher_combinators] to
 define tests in `spec/` directory. These dependencies are required only to run
-tests, that´s why they are installed as git submodules. Additionally, `xml2lua`,
-which is a dependency that should be installed via `luarocks`, is installed
-as a git submodule for use in the test environment.
+tests, that´s why they are installed as git submodules.
