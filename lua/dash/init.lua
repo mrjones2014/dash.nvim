@@ -1,143 +1,39 @@
 local M = {}
 
-local function flatten(items)
-  local flattened = {}
-  for _, item in pairs(items) do
-    for _, subitem in pairs(item) do
-      table.insert(flattened, subitem)
-    end
-  end
-  return flattened
-end
+-- lazy-constructed Telescope picker
+local picker = nil
 
-local function parseResults(xmlString)
-  local xml = require('xml2lua')
-  local handler = require('xmlhandler.tree'):new()
-  local parser = xml.parser(handler)
-  parser:parse(xmlString)
-  if handler.root.output and handler.root.output.items then
-    if handler.root.output.items.item and handler.root.output.items.item.title then
-      return { handler.root.output.items.item }
-    end
-    return flatten(handler.root.output.items)
-  end
-  return {}
-end
-
-local function getMainTextValue(item)
-  local value = item.text
-  if type(value) ~= 'table' then
-    return value
+local function getPicker()
+  if picker ~= nil then
+    return picker
   end
 
-  for _, textValue in pairs(item) do
-    if textValue._attr and textValue._attr.type == 'copy' then
-      return textValue[1]
-    end
-  end
-  return item.title
-end
-
-local function transformSingleItem(item)
-  local title = item.title
-  local value = getMainTextValue(item)
-  if item.subtitle then
-    if type(item.subtitle) == 'table' then
-      title = title .. ': ' .. item.subtitle[#item.subtitle]
-    else
-      title = title .. ': ' .. item.subtitle
-    end
-  end
-  return { title, value }
-end
-
-local function transformItems(output)
-  local items = {}
-  for _, item in pairs(output) do
-    if type(item) == 'table' and item.title then
-      table.insert(items, transformSingleItem(item))
-    end
-  end
-  return items
-end
-
-local function picker()
-  local pickers = require('telescope.pickers')
-  local finders = require('telescope.finders')
-  local sorters = require('telescope.sorters')
-
-  local finderFn = function(prompt)
-    if not prompt or #prompt == 0 then
-      return {}
-    end
-    local utils = require('dash.utils')
-    local result = utils.runSearch(prompt)
-    local stdout = result.stdout
-    local stderr = result.stderr
-
-    if stdout ~= nil then
-      return transformItems(parseResults(stdout))
-    end
-
-    if stderr ~= nil then
-      print(stderr)
-      return {}
-    end
-
-    print('something went wrong')
-    return {}
-  end
-
-  local finder = finders.new_dynamic({
-    fn = finderFn,
-    entry_maker = function(entry)
-      return {
-        value = entry[2],
-        display = entry[1],
-        ordinal = entry[1],
-      }
-    end,
+  local Picker = require('telescope.pickers')
+  local Finder = require('telescope.finders')
+  local Sorter = require('telescope.sorters')
+  local finderUtils = require('dash.utils.telescope')
+  local finder = Finder.new_dynamic({
+    fn = finderUtils.finderFn,
+    entry_maker = finderUtils.entryMaker,
     on_complete = {},
   })
 
-  pickers
-    :new({
-      prompt_title = 'Dash',
-      finder = finder,
-      sorter = sorters.get_generic_fuzzy_sorter(),
-      attach_mappings = function(_, map)
-        map('i', '<CR>', function(buffnr)
-          local entry = require('telescope.actions').get_selected_entry()
-          if not entry then
-            return
-          end
-          local utils = require('dash.utils')
-          utils.openQuery(entry.value)
-          require('telescope.actions').close(buffnr)
-        end)
-        return true
-      end,
-    })
-    :find()
-end
+  picker = Picker:new({
+    prompt_title = 'Dash',
+    finder = finder,
+    sorter = Sorter.get_generic_fuzzy_sorter(),
+    attach_mappings = finderUtils.attachMappings,
+  })
 
-function M.test(query)
-  local utils = require('dash.utils')
-  local result = utils.runSearch(query)
-  local stdout = result.stdout
-  local stderr = result.stderr
-
-  if stdout ~= nil then
-    return transformItems(parseResults(stdout))
-  end
-
-  if stderr ~= nil then
-    print(stderr)
-  end
+  return picker
 end
 
 function M.search()
-  picker()
+  getPicker():find()
+end
+
+function M.setup(config)
+  require('dash.utils.config').setup(config)
 end
 
 return M
