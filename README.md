@@ -22,12 +22,29 @@ use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' } })
 
 ## Configuration
 
-If Dash.app is installed somewhere other than `/Applications/Dash.app`, you can specify the path to use
-by calling the `setup` function. Note that `~` will not be expanded, so you should use `os.getenv('HOME')`
-to specify your home directory. For example:
+All options are set by calling `require('dash').setup(config)`. Options and defaults are described below:
 
 ```lua
-require('dash').setup({ dashAppPath = (os.getenv('HOME') .. '/Applications/Dash.app') })
+{
+  -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
+  dashAppPath = '/Applications/Dash.app',
+  -- map filetype strings to the keywords you've configured for docsets in Dash
+  -- setting to false will disable filtering by filetype for that filetype
+  fileTypeKeywords = {
+    dashboard = false,
+    NvimTree = false,
+    TelescopePrompt = false,
+    terminal = false,
+    packer = false,
+    -- e.g.
+    -- javascript = 'js'
+  },
+  -- disable filtering by current filetype for all filetypes
+  filterWithCurrentFileType = true,
+  -- by default, searching in a TypeScript file will search both TypeScript and JavaScript docsets,
+  -- set to false to disable this behavior
+  searchJavascriptWithTypescript = true,
+}
 ```
 
 ---
