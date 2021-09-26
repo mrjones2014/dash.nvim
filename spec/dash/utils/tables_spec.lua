@@ -28,7 +28,7 @@ describe('concatArrays', function()
   end)
 end)
 
-describe('cloneTableByValue', function()
+describe('deepcopy', function()
   it('should return a new table with a new reference but all the same values', function()
     local source = {
       a = 1,
@@ -36,7 +36,7 @@ describe('cloneTableByValue', function()
         c = 2,
       },
     }
-    local result = tableUtils.cloneTableByValue(source)
+    local result = tableUtils.deepcopy(source)
     assert.are_not.equal(source, result)
     assert.are.equal(source.a, result.a)
     assert.are.equal(source.b.c, result.b.c)
@@ -44,7 +44,7 @@ describe('cloneTableByValue', function()
 end)
 
 describe('mergeTables', function()
-  it('should merge tables recursively, leaving each source table unmodified', function()
+  it('should merge tables recursively', function()
     local tbl1 = {
       a = 1,
       b = {
@@ -57,10 +57,6 @@ describe('mergeTables', function()
       },
     }
     local result = tableUtils.mergeTables(tbl1, tbl2)
-
-    assert.is_nil(tbl1.b.d)
-    assert.is_nil(tbl2.a)
-    assert.is_nil(tbl2.b.c)
 
     assert.are.equal(2, result.b.c)
     assert.are.equal(3, result.b.d)
