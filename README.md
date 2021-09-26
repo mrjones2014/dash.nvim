@@ -36,14 +36,15 @@ All options are set by calling `require('dash').setup(config)`. Options and defa
     TelescopePrompt = false,
     terminal = false,
     packer = false,
-    -- e.g.
-    -- javascript = 'js'
+    -- a table of strings will search on multiple keywords
+    typescript = { 'typescript', 'javascript' },
+    typescriptreact = { 'typescript', 'javascript', 'react' },
+    javascriptreact = { 'javascript', 'react' },
+    -- you can also do a string, for example,
+    -- bash = 'sh'
   },
   -- disable filtering by current filetype for all filetypes
   filterWithCurrentFileType = true,
-  -- by default, searching in a TypeScript file will search both TypeScript and JavaScript docsets,
-  -- set to false to disable this behavior
-  searchJavascriptWithTypescript = true,
 }
 ```
 

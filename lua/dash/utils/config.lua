@@ -8,9 +8,11 @@ M.config = {
     TelescopePrompt = false,
     terminal = false,
     packer = false,
+    typescript = { 'typescript', 'javascript' },
+    typescriptreact = { 'typescript', 'javascript', 'react' },
+    javascriptreact = { 'javascript', 'react' },
   },
   filterWithCurrentFileType = true,
-  searchJavascriptWithTypescript = true,
 }
 
 local function defaultBoolean(value, default)
@@ -28,7 +30,6 @@ function M.setup(newConfig)
     newConfig.fileTypeKeywords or {}
   )
   M.config.filterWithCurrentFileType = defaultBoolean(newConfig.filterWithCurrentFileType, true)
-  M.config.searchJavascriptWithTypescript = defaultBoolean(newConfig.searchJavascriptWithTypescript, true)
 end
 
 return M
