@@ -26,15 +26,25 @@ end
 
 local function transformSingleItem(item)
   local title = item.title
+  local subtitle = title
   local value = getMainTextValue(item)
   if item.subtitle then
     if type(item.subtitle) == 'table' then
       title = title .. ': ' .. item.subtitle[#item.subtitle]
+      subtitle = item.subtitle[#item.subtitle]
     else
       title = title .. ': ' .. item.subtitle
+      subtitle = item.subtitle
     end
   end
-  return { title, value }
+  return {
+    value = value,
+    display = title,
+    ordinal = title,
+    meta = {
+      subtitle = subtitle,
+    },
+  }
 end
 
 function M.transformItems(output)
