@@ -1,25 +1,13 @@
 local M = {}
 
-local function getResults(currentFileType, prompt)
-  local config = require('dash.utils.config').config
-  local modifiedPrompt = prompt .. ''
-  if config.filterWithCurrentFileType and currentFileType and config.fileTypeKeywords[currentFileType] ~= false then
-    local keyword = config.fileTypeKeywords[currentFileType] or currentFileType
-    modifiedPrompt = keyword .. ':' .. modifiedPrompt
-  end
-  local result = require('dash.utils.jobs').runSearch(modifiedPrompt)
+local function getResults(prompt)
+  local result = require('dash.utils.jobs').runSearch(prompt)
   local stdout = result.stdout
   local stderr = result.stderr
 
   if stdout ~= nil then
     local xmlUtils = require('dash.utils.xml')
-    local results = xmlUtils.transformItems(xmlUtils.parse(stdout))
-    -- special case: for TypeScript, also search JavaScript
-    if currentFileType == 'typescript' and config.searchJavascriptWithTypescript then
-      results = require('dash.utils.tables').concatArrays(results, getResults('javascript', prompt))
-    end
-
-    return results
+    return xmlUtils.transformItems(xmlUtils.parse(stdout))
   end
 
   if stderr ~= nil then
@@ -31,13 +19,37 @@ local function getResults(currentFileType, prompt)
   return {}
 end
 
+local function getResultsForFiletype(currentFileType, prompt)
+  local config = require('dash.utils.config').config
+  local fileTypeKeywords = config.fileTypeKeywords[currentFileType]
+  if not config.filterWithCurrentFileType or fileTypeKeywords == false then
+    -- filtering by filetype is disabled
+    return getResults(prompt)
+  end
+
+  if type(fileTypeKeywords) == 'string' then
+    prompt = fileTypeKeywords .. ':' .. prompt
+    return getResults(prompt)
+  end
+
+  if type(fileTypeKeywords) == 'table' then
+    local tableUtils = require('dash.utils.tables')
+    local results = {}
+    for _, value in ipairs(fileTypeKeywords) do
+      local keywordPrompt = value .. ':' .. prompt
+      results = tableUtils.concatArrays(results, getResults(keywordPrompt))
+    end
+    return results
+  end
+end
+
 local function finderFn(currentFileType)
   return function(prompt)
     if not prompt or #prompt == 0 then
       return {}
     end
 
-    return getResults(currentFileType, prompt)
+    return getResultsForFiletype(currentFileType, prompt)
   end
 end
 
