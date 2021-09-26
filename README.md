@@ -36,10 +36,10 @@ require('dash').setup({ dashAppPath = (os.getenv('HOME') .. '/Applications/Dash.
 
 ### Running Tests
 
-Tests This uses [busted][busted], [luassert][luassert] (both through
-[plenary.nvim][plenary]) and [matcher_combinators][matcher_combinators] to
+Tests This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
+[plenary.nvim](https://github.com/nvim-lua/plenary.nvim)) and [matcher_combinators](https://github.com/m00qek/matcher_combinators.lua) to
 define tests in `spec/` directory. These dependencies are required only to run
-tests, that´s why they are installed as git submodules.
+tests, that's why they are installed as git submodules.
 
 To run tests, run `make test`. This runs tests in Neovim with a minimal profile,
 [spec.vim](./spec/spec.vim). This runs Neovim with only this plugin, and the testing dependencies.
