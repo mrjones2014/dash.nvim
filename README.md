@@ -43,7 +43,7 @@ All options are set by calling `require('dash').setup(config)`. Options and defa
     -- you can also do a string, for example,
     -- bash = 'sh'
   },
-  -- disable filtering by current filetype for all filetypes
+  -- enable or disable filtering by current filetype for all filetypes
   filterWithCurrentFileType = true,
 }
 ```
