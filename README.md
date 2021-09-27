@@ -54,7 +54,7 @@ All options are set by calling `require('dash').setup(config)`. Options and defa
 
 ### Running Tests
 
-Tests This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
+This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)) and [matcher_combinators](https://github.com/m00qek/matcher_combinators.lua) to
 define tests in `spec/` directory. These dependencies are required only to run
 tests, that's why they are installed as git submodules.
