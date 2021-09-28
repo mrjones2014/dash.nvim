@@ -67,4 +67,4 @@ using `make watch`.
 
 ### Code Style
 
-Use `cameCase` for everything. Other than that, running `luacheck` and `stylua` should cover it.
+Use `camelCase` for everything. Other than that, running `luacheck` and `stylua` should cover it.
