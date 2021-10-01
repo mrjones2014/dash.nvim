@@ -30,6 +30,8 @@ All options are set by calling `require('dash').setup(config)`. Options and defa
   dashAppPath = '/Applications/Dash.app',
   -- map filetype strings to the keywords you've configured for docsets in Dash
   -- setting to false will disable filtering by filetype for that filetype
+  -- filetypes not included in this table will not filter the query by filetype
+  -- check lua/dash/utils/config.lua to see all defaults
   fileTypeKeywords = {
     dashboard = false,
     NvimTree = false,
@@ -43,10 +45,10 @@ All options are set by calling `require('dash').setup(config)`. Options and defa
     -- you can also do a string, for example,
     -- bash = 'sh'
   },
-  -- enable or disable filtering by current filetype for all filetypes
-  filterWithCurrentFileType = true,
 }
 ```
+
+If you notice an issue with the default `fileTypeKeywords` or would like a new filetype added, please file an issue or submit a PR!
 
 ---
 
