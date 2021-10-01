@@ -12,6 +12,8 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 Show the picker with `:Dash` or `require('dash').search()`
 
+This plugin also adds filetype detection for [Handlebars](https://handlebarsjs.com) (`.hbs` files) in order to search the Handlebars docset.
+
 ## Install
 
 Using Packer:
