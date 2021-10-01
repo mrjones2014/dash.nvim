@@ -10,7 +10,12 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Usage
 
-Show the picker with `:Dash` or `require('dash').search()`
+There are several ways to trigger the picker:
+
+- `:Dash`
+- ':Telescope dash search'
+- `:lua require('dash').search()`
+- `:lua require('telescope').extensions.dash.search()`
 
 This plugin also adds filetype detection for [Handlebars](https://handlebarsjs.com) (`.hbs` files) in order to search the Handlebars docset.
 
@@ -24,30 +29,34 @@ use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' } })
 
 ## Configuration
 
-All options are set by calling `require('dash').setup(config)`. Options and defaults are described below:
+`dash.nvim` can be configured in your Telescope config. Options and defaults are described below:
 
 ```lua
-{
-  -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
-  dashAppPath = '/Applications/Dash.app',
-  -- map filetype strings to the keywords you've configured for docsets in Dash
-  -- setting to false will disable filtering by filetype for that filetype
-  -- filetypes not included in this table will not filter the query by filetype
-  -- check lua/dash/utils/config.lua to see all defaults
-  fileTypeKeywords = {
-    dashboard = false,
-    NvimTree = false,
-    TelescopePrompt = false,
-    terminal = false,
-    packer = false,
-    -- a table of strings will search on multiple keywords
-    typescript = { 'typescript', 'javascript' },
-    typescriptreact = { 'typescript', 'javascript', 'react' },
-    javascriptreact = { 'javascript', 'react' },
-    -- you can also do a string, for example,
-    -- bash = 'sh'
-  },
-}
+require('telescope').setup({
+  extensions = {
+    dash = {
+      -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
+      dashAppPath = '/Applications/Dash.app',
+      -- map filetype strings to the keywords you've configured for docsets in Dash
+      -- setting to false will disable filtering by filetype for that filetype
+      -- filetypes not included in this table will not filter the query by filetype
+      -- check lua/dash/utils/config.lua to see all defaults
+      fileTypeKeywords = {
+        dashboard = false,
+        NvimTree = false,
+        TelescopePrompt = false,
+        terminal = false,
+        packer = false,
+        -- a table of strings will search on multiple keywords
+        typescript = { 'typescript', 'javascript' },
+        typescriptreact = { 'typescript', 'javascript', 'react' },
+        javascriptreact = { 'javascript', 'react' },
+        -- you can also do a string, for example,
+        -- bash = 'sh'
+      },
+    }
+  }
+})
 ```
 
 If you notice an issue with the default `fileTypeKeywords` or would like a new filetype added, please file an issue or submit a PR!
