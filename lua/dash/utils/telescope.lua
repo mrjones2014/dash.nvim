@@ -22,8 +22,13 @@ end
 local function getResultsForFiletype(currentFileType, prompt)
   local config = require('dash.utils.config').config
   local fileTypeKeywords = config.fileTypeKeywords[currentFileType]
-  if not config.filterWithCurrentFileType or fileTypeKeywords == false then
+  if not fileTypeKeywords then
     -- filtering by filetype is disabled
+    return getResults(prompt)
+  end
+
+  if fileTypeKeywords == true then
+    prompt = currentFileType .. ':' .. prompt
     return getResults(prompt)
   end
 
