@@ -70,6 +70,29 @@ local function attachMappings(_, map)
   return true
 end
 
+local function buildPickerTitle()
+  local config = require('dash.utils.config').config
+  local filetype = vim.bo.filetype
+  local fileTypeKeywords = config.fileTypeKeywords[filetype]
+  if not fileTypeKeywords then
+    return 'Dash'
+  end
+
+  if fileTypeKeywords == true then
+    return 'Dash - ' .. filetype
+  end
+
+  if type(fileTypeKeywords) == 'string' then
+    return 'Dash - ' .. fileTypeKeywords
+  end
+
+  if type(fileTypeKeywords) == 'table' then
+    return 'Dash - ' .. (vim.inspect(fileTypeKeywords)):gsub('\n', '')
+  end
+
+  return 'Dash'
+end
+
 function M.buildPicker()
   local Picker = require('telescope.pickers')
   local Finder = require('telescope.finders')
@@ -83,7 +106,7 @@ function M.buildPicker()
   })
 
   local picker = Picker:new({
-    prompt_title = 'Dash',
+    prompt_title = buildPickerTitle(),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
     attach_mappings = attachMappings,
