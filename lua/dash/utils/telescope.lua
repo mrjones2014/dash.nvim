@@ -1,5 +1,21 @@
 local M = {}
 
+local isW3mInstalled = (function()
+  local isInstalled = false
+  require('plenary.job')
+    :new({
+      command = 'which',
+      args = { 'w3m' },
+      cwd = vim.fn.getcwd(),
+      enabled_recording = true,
+      on_exit = function(_, return_val)
+        isInstalled = return_val == 0
+      end,
+    })
+    :sync()
+  return isInstalled
+end)()
+
 local function getResults(prompt)
   local result = require('dash.utils.jobs').runSearch(prompt)
   local stdout = result.stdout
@@ -82,9 +98,20 @@ function M.buildPicker()
     on_complete = {},
   })
 
+  local previewer = nil
+  if isW3mInstalled then
+    previewer = require('telescope.previewers').new_termopen_previewer({
+      get_command = function(entry)
+        print(vim.inspect(entry))
+        return { 'w3m', '-dump', entry.quickLookUrl }
+      end,
+    })
+  end
+
   local picker = Picker:new({
     prompt_title = 'Dash',
     finder = finder,
+    previewer = previewer,
     sorter = Sorter.get_generic_fuzzy_sorter(),
     attach_mappings = attachMappings,
   })

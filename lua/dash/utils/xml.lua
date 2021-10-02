@@ -38,6 +38,7 @@ local function transformSingleItem(item)
     value = value,
     display = title,
     ordinal = title,
+    quickLookUrl = item.quicklookurl,
   }
 end
 
