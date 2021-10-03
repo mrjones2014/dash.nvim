@@ -58,7 +58,8 @@ require('telescope').setup({
         terminal = false,
         packer = false,
         -- a table of strings will search on multiple keywords
-        typescript = { 'typescript', 'javascript' },
+        javascript = { 'javascript', 'nodejs' },
+        typescript = { 'typescript', 'javascript', 'nodejs' },
         typescriptreact = { 'typescript', 'javascript', 'react' },
         javascriptreact = { 'javascript', 'react' },
         -- you can also do a string, for example,
