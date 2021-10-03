@@ -13,9 +13,16 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 There are several ways to trigger the picker:
 
 - `:Dash`
-- ':Telescope dash search'
+- `:Telescope dash search`
 - `:lua require('dash').search()`
 - `:lua require('telescope').extensions.dash.search()`
+
+By default, it filters the Dash query based on `fileTypeKeywords` in the config. To do a single search without this filtering,
+you can use the bang (`!`) or pass `true` to the Lua function:
+
+- `:Dash!`
+- `:lua require('dash').search(true)`
+- `:lua require('telescope').extensions.dash.search(true)`
 
 This plugin also adds filetype detection for [Handlebars](https://handlebarsjs.com) (`.hbs` files) in order to search the Handlebars docset.
 
@@ -41,6 +48,9 @@ require('telescope').setup({
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
       -- check lua/dash/utils/config.lua to see all defaults
+      -- the values you pass for fileTypeKeywords are merged with the defaults
+      -- to disable filtering for all filetypes,
+      -- set fileTypeKeywords = false
       fileTypeKeywords = {
         dashboard = false,
         NvimTree = false,

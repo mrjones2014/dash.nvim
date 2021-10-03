@@ -61,10 +61,15 @@ M.config = {
 function M.setup(newConfig)
   newConfig = newConfig or {}
   M.config.dashAppPath = newConfig.dashAppPath or M.config.dashAppPath
-  M.config.fileTypeKeywords = require('dash.utils.tables').mergeTables(
-    M.config.fileTypeKeywords,
-    newConfig.fileTypeKeywords or {}
-  )
+
+  if newConfig.fileTypeKeywords == false then
+    M.config.fileTypeKeywords = {}
+  else
+    M.config.fileTypeKeywords = require('dash.utils.tables').mergeTables(
+      M.config.fileTypeKeywords,
+      newConfig.fileTypeKeywords or {}
+    )
+  end
 end
 
 return M
