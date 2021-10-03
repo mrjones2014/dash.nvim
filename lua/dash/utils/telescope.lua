@@ -19,10 +19,10 @@ local function getResults(prompt)
   return {}
 end
 
-local function getResultsForFiletype(currentFileType, prompt)
+local function getResultsForFiletype(currentFileType, prompt, bang)
   local config = require('dash.utils.config').config
   local fileTypeKeywords = config.fileTypeKeywords[currentFileType]
-  if not fileTypeKeywords then
+  if bang == true or not fileTypeKeywords then
     -- filtering by filetype is disabled
     return getResults(prompt)
   end
@@ -48,13 +48,13 @@ local function getResultsForFiletype(currentFileType, prompt)
   end
 end
 
-local function finderFn(currentFileType)
+local function finderFn(currentFileType, bang)
   return function(prompt)
     if not prompt or #prompt == 0 then
       return {}
     end
 
-    return getResultsForFiletype(currentFileType, prompt)
+    return getResultsForFiletype(currentFileType, prompt, bang)
   end
 end
 
@@ -93,12 +93,12 @@ local function buildPickerTitle()
   return 'Dash'
 end
 
-function M.buildPicker()
+function M.buildPicker(bang)
   local Picker = require('telescope.pickers')
   local Finder = require('telescope.finders')
   local Sorter = require('telescope.sorters')
   local finder = Finder.new_dynamic({
-    fn = finderFn(vim.bo.filetype),
+    fn = finderFn(vim.bo.filetype, bang),
     entry_maker = function(entry)
       return entry
     end,

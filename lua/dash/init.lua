@@ -14,8 +14,8 @@ function M.registerWithTelescope()
   })
 end
 
-function M.search()
-  require('dash.utils.telescope').buildPicker():find()
+function M.search(bang)
+  require('dash.utils.telescope').buildPicker(bang == true):find()
 end
 
 function M.setup(config)
