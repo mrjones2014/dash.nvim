@@ -17,7 +17,8 @@ There are several ways to trigger the picker:
 - `:lua require('dash').search()`
 - `:lua require('telescope').extensions.dash.search()`
 
-By default, it filters the Dash query based on `fileTypeKeywords` in the config. To do a single search without this filtering,
+By default, triggering from filetypes configured in `fileTypeKeywords` in the config filter the
+Dash query based on the filetype. To do a single search without this filtering,
 you can use the bang (`!`) or pass `true` to the Lua function:
 
 - `:Dash!`
