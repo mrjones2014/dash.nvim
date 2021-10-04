@@ -1,11 +1,11 @@
 local tableUtils = require('dash.utils.tables')
 local assert = require('luassert')
 
-describe('concatArrays', function()
+describe('concat_arrays', function()
   it('should concatenate array tables together, leaving both original arrays unmodified', function()
     local arr1 = { '1', '2', '3' }
     local arr2 = { '4', '5', '6' }
-    local result = tableUtils.concatArrays(arr1, arr2)
+    local result = tableUtils.concat_arrays(arr1, arr2)
 
     assert.are.equal(3, #arr1)
     assert.are.equal(3, #arr2)
@@ -43,7 +43,7 @@ describe('deepcopy', function()
   end)
 end)
 
-describe('mergeTables', function()
+describe('merge_tables', function()
   it('should merge tables recursively', function()
     local tbl1 = {
       a = 1,
@@ -56,7 +56,7 @@ describe('mergeTables', function()
         d = 3,
       },
     }
-    local result = tableUtils.mergeTables(tbl1, tbl2)
+    local result = tableUtils.merge_tables(tbl1, tbl2)
 
     assert.are.equal(2, result.b.c)
     assert.are.equal(3, result.b.d)
@@ -76,7 +76,7 @@ describe('mergeTables', function()
         d = 4,
       },
     }
-    local result = tableUtils.mergeTables(tbl1, tbl2)
+    local result = tableUtils.merge_tables(tbl1, tbl2)
 
     assert.are.equal(3, result.b)
     assert.are.equal(4, result.c.d)

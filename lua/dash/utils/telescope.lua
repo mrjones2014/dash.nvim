@@ -1,13 +1,13 @@
 local M = {}
 
-local function getResults(prompt)
-  local result = require('dash.utils.jobs').runSearch(prompt)
+local function get_results(prompt, keyword)
+  local result = require('dash.utils.jobs').run_search(prompt)
   local stdout = result.stdout
   local stderr = result.stderr
 
   if stdout ~= nil then
     local xmlUtils = require('dash.utils.xml')
-    return xmlUtils.transformItems(xmlUtils.parse(stdout))
+    return xmlUtils.transform_items(xmlUtils.parse(stdout), keyword)
   end
 
   if stderr ~= nil then
@@ -19,86 +19,92 @@ local function getResults(prompt)
   return {}
 end
 
-local function getResultsForFiletype(currentFileType, prompt, bang)
+local function get_results_for_filetype(current_file_type, prompt, bang)
   local config = require('dash.utils.config').config
-  local fileTypeKeywords = config.fileTypeKeywords[currentFileType]
-  if bang == true or not fileTypeKeywords then
+  local file_type_keywords = config.file_type_keywords[current_file_type]
+  if bang == true or not file_type_keywords then
     -- filtering by filetype is disabled
-    return getResults(prompt)
+    return get_results(prompt)
   end
 
-  if fileTypeKeywords == true then
-    prompt = currentFileType .. ':' .. prompt
-    return getResults(prompt)
+  if file_type_keywords == true then
+    prompt = current_file_type .. ':' .. prompt
+    return get_results(prompt, current_file_type)
   end
 
-  if type(fileTypeKeywords) == 'string' then
-    prompt = fileTypeKeywords .. ':' .. prompt
-    return getResults(prompt)
+  if type(file_type_keywords) == 'string' then
+    prompt = file_type_keywords .. ':' .. prompt
+    return get_results(prompt, file_type_keywords)
   end
 
-  if type(fileTypeKeywords) == 'table' then
+  if type(file_type_keywords) == 'table' then
     local tableUtils = require('dash.utils.tables')
     local results = {}
-    for _, value in ipairs(fileTypeKeywords) do
-      local keywordPrompt = value .. ':' .. prompt
-      results = tableUtils.concatArrays(results, getResults(keywordPrompt))
+    for _, value in ipairs(file_type_keywords) do
+      local keyword_prompt = value .. ':' .. prompt
+      results = tableUtils.concat_arrays(results, get_results(keyword_prompt, value))
     end
     return results
   end
 end
 
-local function finderFn(currentFileType, bang)
+local function finder_fn(current_file_type, bang)
   return function(prompt)
     if not prompt or #prompt == 0 then
       return {}
     end
 
-    return getResultsForFiletype(currentFileType, prompt, bang)
+    return get_results_for_filetype(current_file_type, prompt, bang)
   end
 end
 
-local function attachMappings(_, map)
+local function attach_mappings(_, map)
   map('i', '<CR>', function(buffnr)
     local entry = require('telescope.actions').get_selected_entry()
     if not entry then
       return
     end
-    require('dash.utils.jobs').openQuery(entry.value)
+    local query = entry.value
+    if entry.keyword ~= nil and type(entry.keyword) == 'string' then
+      query = entry.keyword .. ':' .. query
+    end
+    local jobs = require('dash.utils.jobs')
+    jobs.run_search(query)
+    jobs.open_query(query)
     require('telescope.actions').close(buffnr)
   end)
   return true
 end
 
-local function buildPickerTitle()
+local function build_picker_title()
   local config = require('dash.utils.config').config
   local filetype = vim.bo.filetype
-  local fileTypeKeywords = config.fileTypeKeywords[filetype]
-  if not fileTypeKeywords then
+  local file_type_keywords = config.file_type_keywords[filetype]
+  if not file_type_keywords then
     return 'Dash'
   end
 
-  if fileTypeKeywords == true then
+  if file_type_keywords == true then
     return 'Dash - ' .. filetype
   end
 
-  if type(fileTypeKeywords) == 'string' then
-    return 'Dash - ' .. fileTypeKeywords
+  if type(file_type_keywords) == 'string' then
+    return 'Dash - ' .. file_type_keywords
   end
 
-  if type(fileTypeKeywords) == 'table' then
-    return 'Dash - ' .. (vim.inspect(fileTypeKeywords)):gsub('\n', '')
+  if type(file_type_keywords) == 'table' then
+    return 'Dash - ' .. (vim.inspect(file_type_keywords)):gsub('\n', '')
   end
 
   return 'Dash'
 end
 
-function M.buildPicker(bang)
+function M.build_picker(bang)
   local Picker = require('telescope.pickers')
   local Finder = require('telescope.finders')
   local Sorter = require('telescope.sorters')
   local finder = Finder.new_dynamic({
-    fn = finderFn(vim.bo.filetype, bang),
+    fn = finder_fn(vim.bo.filetype, bang),
     entry_maker = function(entry)
       return entry
     end,
@@ -106,10 +112,10 @@ function M.buildPicker(bang)
   })
 
   local picker = Picker:new({
-    prompt_title = buildPickerTitle(),
+    prompt_title = build_picker_title(),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
-    attach_mappings = attachMappings,
+    attach_mappings = attach_mappings,
   })
 
   return picker

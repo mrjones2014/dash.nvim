@@ -9,18 +9,18 @@ describe('urlencode', function()
   end)
 end)
 
-describe('joinListToString', function()
+describe('join_list_to_string', function()
   it('should join a list of strings to a single string, each entry its own line', function()
     local list = { 'a', 'b', 'c' }
     local result = 'a\nb\nc'
-    assert.are.equal(strings.joinListToString(list), result)
+    assert.are.equal(strings.join_list_to_string(list), result)
   end)
 end)
 
-describe('trimTrailingNewlines', function()
+describe('trim_trailing_newlines', function()
   it('should trim trailing newlines', function()
     local str = 'abc\n'
     local result = 'abc'
-    assert.are.equal(strings.trimTrailingNewlines(str), result)
+    assert.are.equal(strings.trim_trailing_newlines(str), result)
   end)
 end)

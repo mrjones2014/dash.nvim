@@ -1,15 +1,15 @@
 local M = {}
 
-function M.runSearch(query)
+function M.run_search(query)
   local Job = require('plenary.job')
   local stdout = nil
   local stderr = nil
   -- gsub to remove trailing slash, if there is one, because we're adding one
-  local dashAppPath = require('dash.utils.config').config.dashAppPath
-  local cliPath = (dashAppPath:gsub('(.)%/$', '%1')) .. '/Contents/Resources/dashAlfredWorkflow'
+  local dash_app_path = require('dash.utils.config').config.dash_app_path
+  local cli_path = (dash_app_path:gsub('(.)%/$', '%1')) .. '/Contents/Resources/dashAlfredWorkflow'
   Job
     :new({
-      command = cliPath,
+      command = cli_path,
       args = { query },
       cwd = vim.fn.getcwd(),
       enabled_recording = true,
@@ -23,15 +23,15 @@ function M.runSearch(query)
     })
     :sync()
 
-  local stringUtils = require('dash.utils.strings')
+  local strings = require('dash.utils.strings')
 
   return {
-    stdout = stringUtils.trimTrailingNewlines(stringUtils.joinListToString(stdout)),
-    stderr = stringUtils.trimTrailingNewlines(stringUtils.joinListToString(stderr)),
+    stdout = strings.trim_trailing_newlines(strings.join_list_to_string(stdout)),
+    stderr = strings.trim_trailing_newlines(strings.join_list_to_string(stderr)),
   }
 end
 
-function M.openQuery(query)
+function M.open_query(query)
   local Job = require('plenary.job')
 
   Job
