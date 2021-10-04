@@ -17,11 +17,12 @@ There are several ways to trigger the picker:
 - `:lua require('dash').search()`
 - `:lua require('telescope').extensions.dash.search()`
 
-By default, triggering from filetypes configured in `fileTypeKeywords` in the config filter the
+By default, triggering from filetypes configured in `file_type_keywords` in the config filter the
 Dash query based on the filetype. To do a single search without this filtering,
 you can use the bang (`!`) or pass `true` to the Lua function:
 
 - `:Dash!`
+- `:Telescope dash search_no_filter`
 - `:lua require('dash').search(true)`
 - `:lua require('telescope').extensions.dash.search(true)`
 
@@ -44,15 +45,15 @@ require('telescope').setup({
   extensions = {
     dash = {
       -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
-      dashAppPath = '/Applications/Dash.app',
+      dash_app_path = '/Applications/Dash.app',
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
       -- check lua/dash/utils/config.lua to see all defaults
-      -- the values you pass for fileTypeKeywords are merged with the defaults
+      -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
-      -- set fileTypeKeywords = false
-      fileTypeKeywords = {
+      -- set file_type_keywords = false
+      file_type_keywords = {
         dashboard = false,
         NvimTree = false,
         TelescopePrompt = false,
@@ -71,7 +72,7 @@ require('telescope').setup({
 })
 ```
 
-If you notice an issue with the default `fileTypeKeywords` or would like a new filetype added, please file an issue or submit a PR!
+If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
 
 ---
 
@@ -92,4 +93,4 @@ using `make watch`.
 
 ### Code Style
 
-Use `camelCase` for everything. Other than that, running `luacheck` and `stylua` should cover it.
+Use `snake_case` for everything. Other than that, running `luacheck` and `stylua` should cover it.

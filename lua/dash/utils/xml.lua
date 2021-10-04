@@ -10,7 +10,7 @@ local function flatten(items)
   return flattened
 end
 
-local function getMainTextValue(item)
+local function get_main_text_value(item)
   local value = item.text
   if type(value) ~= 'table' then
     return value
@@ -24,9 +24,9 @@ local function getMainTextValue(item)
   return item.title
 end
 
-local function transformSingleItem(item)
+local function transform_single_item(item, keyword)
   local title = item.title
-  local value = getMainTextValue(item)
+  local value = get_main_text_value(item)
   if item.subtitle then
     if type(item.subtitle) == 'table' then
       title = title .. ': ' .. item.subtitle[#item.subtitle]
@@ -38,14 +38,15 @@ local function transformSingleItem(item)
     value = value,
     display = title,
     ordinal = title,
+    keyword = keyword,
   }
 end
 
-function M.transformItems(output)
+function M.transform_items(output, keyword)
   local items = {}
   for _, item in pairs(output) do
     if type(item) == 'table' and item.title then
-      table.insert(items, transformSingleItem(item))
+      table.insert(items, transform_single_item(item, keyword))
     end
   end
   return items

@@ -14,7 +14,7 @@ function M.urlencode(url)
   return url
 end
 
-function M.joinListToString(output)
+function M.join_list_to_string(output)
   if not (type(output) == 'table') then
     return output
   end
@@ -23,10 +23,10 @@ function M.joinListToString(output)
   for _, val in pairs(output) do
     str = str .. val .. '\n'
   end
-  return M.trimTrailingNewlines(str)
+  return M.trim_trailing_newlines(str)
 end
 
-function M.trimTrailingNewlines(str)
+function M.trim_trailing_newlines(str)
   if str == nil then
     return nil
   end

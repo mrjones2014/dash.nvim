@@ -1,8 +1,8 @@
 local M = {}
 
 M.config = {
-  dashAppPath = '/Applications/Dash.app',
-  fileTypeKeywords = {
+  dash_app_path = '/Applications/Dash.app',
+  file_type_keywords = {
     dashboard = false,
     NvimTree = false,
     TelescopePrompt = false,
@@ -58,16 +58,16 @@ M.config = {
   },
 }
 
-function M.setup(newConfig)
-  newConfig = newConfig or {}
-  M.config.dashAppPath = newConfig.dashAppPath or M.config.dashAppPath
+function M.setup(new_config)
+  new_config = new_config or {}
+  M.config.dash_app_path = new_config.dash_app_path or M.config.dash_app_path
 
-  if newConfig.fileTypeKeywords == false then
-    M.config.fileTypeKeywords = {}
+  if new_config.file_type_keywords == false then
+    M.config.file_type_keywords = {}
   else
-    M.config.fileTypeKeywords = require('dash.utils.tables').mergeTables(
-      M.config.fileTypeKeywords,
-      newConfig.fileTypeKeywords or {}
+    M.config.file_type_keywords = require('dash.utils.tables').merge_tables(
+      M.config.file_type_keywords,
+      new_config.file_type_keywords or {}
     )
   end
 end

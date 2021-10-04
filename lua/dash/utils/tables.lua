@@ -1,6 +1,6 @@
 local M = {}
 
-function M.concatArrays(array1, array2)
+function M.concat_arrays(array1, array2)
   local result = {}
   for _, value in ipairs(array1) do
     table.insert(result, value)
@@ -13,20 +13,20 @@ function M.concatArrays(array1, array2)
   return result
 end
 
-local function deepCopyHelper(orig, copies)
+local function deep_copy_helper(orig, copies)
   copies = copies or {}
-  local origType = type(orig)
+  local orig_type = type(orig)
   local copy
-  if origType == 'table' then
+  if orig_type == 'table' then
     if copies[orig] then
       copy = copies[orig]
     else
       copy = {}
       copies[orig] = copy
       for origKey, origValue in next, orig, nil do
-        copy[deepCopyHelper(origKey, copies)] = deepCopyHelper(origValue, copies)
+        copy[deep_copy_helper(origKey, copies)] = deep_copy_helper(origValue, copies)
       end
-      setmetatable(copy, deepCopyHelper(getmetatable(orig), copies))
+      setmetatable(copy, deep_copy_helper(getmetatable(orig), copies))
     end
   else -- number, string, boolean, etc
     copy = orig
@@ -35,14 +35,14 @@ local function deepCopyHelper(orig, copies)
 end
 
 function M.deepcopy(tbl)
-  return deepCopyHelper(tbl)
+  return deep_copy_helper(tbl)
 end
 
-function M.mergeTables(t1, t2)
+function M.merge_tables(t1, t2)
   for k, v in pairs(t2) do
     if type(v) == 'table' then
       if type(t1[k] or false) == 'table' then
-        M.mergeTables(t1[k] or {}, t2[k] or {})
+        M.merge_tables(t1[k] or {}, t2[k] or {})
       else
         t1[k] = v
       end
