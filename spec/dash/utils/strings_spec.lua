@@ -3,9 +3,9 @@ local assert = require('luassert')
 
 describe('urlencode', function()
   it('should replace each reserved character with its percent-encoded equivalent', function()
-    local stringWithReservedChars = "string-!#$%&'()*+,/:;=?@[]"
+    local string_with_reserved_chars = "string-!#$%&'()*+,/:;=?@[]"
     local expectedResult = 'string-%21%23%24%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D'
-    assert.are.equal(strings.urlencode(stringWithReservedChars), expectedResult)
+    assert.are.equal(strings.urlencode(string_with_reserved_chars), expectedResult)
   end)
 end)
 

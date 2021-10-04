@@ -1,19 +1,5 @@
 local M = {}
 
-local telescopeRegistered = false
-
-function M.registerWithTelescope()
-  if telescopeRegistered then
-    return
-  end
-  require('telescope._extensions').register({
-    setup = M.setup,
-    exports = {
-      M.search,
-    },
-  })
-end
-
 function M.search(bang)
   require('dash.utils.telescope').build_picker(bang == true):find()
 end
