@@ -1,5 +1,7 @@
+---@class ConfigManager
 local M = {}
 
+---@class Config
 M.config = {
   dash_app_path = '/Applications/Dash.app',
   file_type_keywords = {
@@ -58,6 +60,8 @@ M.config = {
   },
 }
 
+--- Merge user config with default config
+---@param new_config Config
 function M.setup(new_config)
   new_config = new_config or {}
   M.config.dash_app_path = new_config.dash_app_path or M.config.dash_app_path

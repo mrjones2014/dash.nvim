@@ -1,9 +1,7 @@
 local M = {}
 
 local function get_results(prompt, keyword)
-  local result = require('dash.utils.jobs').run_search(prompt)
-  local stdout = result.stdout
-  local stderr = result.stderr
+  local stdout, stderr = require('dash.utils.jobs').run_search(prompt)
 
   if stdout ~= nil then
     local xmlUtils = require('dash.utils.xml')
@@ -99,6 +97,8 @@ local function build_picker_title()
   return 'Dash'
 end
 
+--- Build a Telescope picker for Dash.app and return it
+---@return table @Telescope Picker, has :find() method
 function M.build_picker(bang)
   local Picker = require('telescope.pickers')
   local Finder = require('telescope.finders')

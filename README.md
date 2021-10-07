@@ -93,4 +93,6 @@ using `make watch`.
 
 ### Code Style
 
-Use `snake_case` for everything. Other than that, running `luacheck` and `stylua` should cover it.
+Use `snake_case` for everything. Ensure you use [EmmyLua Annotations](https://github.com/sumneko/lua-language-server/wiki/EmmyLua%2DAnnotations)
+for any public-facing API, and optionally for non-public functions, if the function is non-trivial or the types are not obvious.
+Other than that, running `luacheck` and `stylua` should cover it.
