@@ -1,5 +1,8 @@
 local M = {}
 
+--- Search Dash.app for query, return stdout, stderr
+---@param query string
+---@return string, string
 function M.run_search(query)
   local Job = require('plenary.job')
   local stdout = nil
@@ -24,13 +27,12 @@ function M.run_search(query)
     :sync()
 
   local strings = require('dash.utils.strings')
-
-  return {
-    stdout = strings.trim_trailing_newlines(strings.join_list_to_string(stdout)),
-    stderr = strings.trim_trailing_newlines(strings.join_list_to_string(stderr)),
-  }
+  return strings.trim_trailing_newlines(strings.join_list_to_string(stdout)),
+    strings.trim_trailing_newlines(strings.join_list_to_string(stderr))
 end
 
+--- Open the query in Dash.app
+---@param query string
 function M.open_query(query)
   local Job = require('plenary.job')
 

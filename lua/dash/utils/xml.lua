@@ -42,6 +42,10 @@ local function transform_single_item(item, keyword)
   }
 end
 
+---
+---@param output table @the parsed XML output table
+---@param keyword string @optional, the filter keyword being used for the current query
+---@return table
 function M.transform_items(output, keyword)
   local items = {}
   for _, item in pairs(output) do
@@ -52,6 +56,9 @@ function M.transform_items(output, keyword)
   return items
 end
 
+--- Parse the XML string and return the converted table of items
+---@param xmlString string @the XML string to parse
+---@return table
 function M.parse(xmlString)
   local xml = require('dash.utils.xml2lua')
   local handler = require('dash.utils.xml2lua.xmlhandler.tree'):new()
