@@ -1,7 +1,7 @@
----@class ConfigManager
+---@class ConfigurationManager
 local M = {}
 
----@class Config
+---@class Configuration
 M.config = {
   dash_app_path = '/Applications/Dash.app',
   file_type_keywords = {
