@@ -1,10 +1,16 @@
-local dash = require('dash')
 return require('telescope').register_extension({
-  setup = dash.setup,
+  setup = function(config)
+    require('dash').setup(config)
+  end,
+  health = function()
+    require('dash.health').check()
+  end,
   exports = {
-    search = dash.search,
+    search = function()
+      require('dash').search()
+    end,
     search_no_filter = function()
-      dash.search(true)
+      require('dash').search(true)
     end,
   },
 })

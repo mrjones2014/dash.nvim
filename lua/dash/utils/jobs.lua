@@ -1,5 +1,10 @@
 local M = {}
 
+function M.build_cli_path(dash_app_path)
+  -- gsub to remove trailing slash, if there is one, because we're adding one
+  return (dash_app_path:gsub('(.)%/$', '%1')) .. '/Contents/Resources/dashAlfredWorkflow'
+end
+
 --- Search Dash.app for query, return stdout, stderr
 ---@param query string
 ---@return string, string
@@ -7,9 +12,8 @@ function M.run_search(query)
   local Job = require('plenary.job')
   local stdout = nil
   local stderr = nil
-  -- gsub to remove trailing slash, if there is one, because we're adding one
   local dash_app_path = require('dash.utils.config').config.dash_app_path
-  local cli_path = (dash_app_path:gsub('(.)%/$', '%1')) .. '/Contents/Resources/dashAlfredWorkflow'
+  local cli_path = M.build_cli_path(dash_app_path)
   Job
     :new({
       command = cli_path,
