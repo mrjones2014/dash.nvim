@@ -5,7 +5,7 @@ function M.search(bang)
   require('dash.utils.telescope').build_picker(bang == true):find()
 end
 
----@param config Configuration
+---@param config DashConfig
 function M.setup(config)
   require('dash.utils.config').setup(config)
 end

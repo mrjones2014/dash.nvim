@@ -13,5 +13,6 @@ endfunction
 
 command! -nargs=0 -bang Dash :call <SID>run_with_bang(<bang>0)
 lua require('telescope._extensions.dash')
+lua require('telescope').load_extension('dash')
 
 let g:loaded_dash_nvim = 1
