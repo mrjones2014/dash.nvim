@@ -5,7 +5,7 @@ use roxmltree::Document;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
-pub fn run_query(cli_path: &String, query: &String) -> String {
+pub async fn run_query(cli_path: &String, query: &String) -> String {
     let raw_output = Command::new(cli_path)
         .args(&[query])
         .output()
