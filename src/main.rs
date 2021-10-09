@@ -1,10 +1,10 @@
-extern crate argparse;
-// use std::vec;
+mod cli_runner;
 
+extern crate argparse;
 use argparse::{ArgumentParser, Collect, Store};
 
 fn main() {
-    let mut cli_path = "/Applications/Dash.app".to_string();
+    let mut cli_path = "/Applications/Dash.app".to_string().to_owned();
     let mut queries: Vec<String> = [].to_vec();
     {
         let mut ap = ArgumentParser::new();
@@ -19,6 +19,8 @@ fn main() {
         ap.parse_args_or_exit();
     }
 
-    println!("{}", cli_path);
-    println!("{:#?}", queries);
+    cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
+    for query in &queries {
+        cli_runner::run_query(&cli_path.to_string(), &query.to_string());
+    }
 }

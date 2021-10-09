@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 argparse = "0.2.2"
+roxmltree = "0.14.1"
+regex = "1"
