@@ -2,6 +2,7 @@ mod cli_runner;
 
 extern crate argparse;
 use argparse::{ArgumentParser, Collect, Store};
+use std::thread;
 
 fn main() {
     let mut cli_path = "/Applications/Dash.app".to_string().to_owned();
@@ -20,13 +21,22 @@ fn main() {
     }
 
     cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
+
+    let mut threads = Vec::new();
+
     println!("[");
     let mut results = [].to_vec();
     for query in &queries {
-        results.push(cli_runner::run_query(
-            &cli_path.to_string(),
-            &query.to_string(),
-        ));
+        threads.push(thread::spawn(|| {
+            results.push(cli_runner::run_query(
+                &cli_path.to_string(),
+                &query.to_string(),
+            ));
+        }))
+    }
+
+    for thread in &threads {
+        thread.join();
     }
     println!("{}", results.join(","));
     println!("]");
