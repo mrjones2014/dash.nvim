@@ -5,7 +5,7 @@ use roxmltree::Document;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
-pub fn run_query(cli_path: &String, query: &String) {
+pub fn run_query(cli_path: &String, query: &String) -> String {
     let raw_output = Command::new(cli_path)
         .args(&[query])
         .output()
@@ -17,6 +17,8 @@ pub fn run_query(cli_path: &String, query: &String) {
     let items_element = doc.descendants().find(|n| n.tag_name().name() == "items");
 
     let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
+
+    let mut json_items = [].to_vec();
 
     &items_element.unwrap().children().for_each(|item| {
         let item_value = item
@@ -55,9 +57,11 @@ pub fn run_query(cli_path: &String, query: &String) {
                 .unwrap()
                 .as_str();
         }
-        println!(
-            "{{ \"value\": {:?}, \"display\": {:?}, \"ordinal\": {:?}, \"keyword\": {:?} }},",
+        let json_blob = format!(
+            "{{ \"value\": {:?}, \"display\": {:?}, \"ordinal\": {:?}, \"keyword\": {:?} }}",
             item_value, title, title, keyword
         );
+        json_items.push(json_blob);
     });
+    return json_items.join(",");
 }

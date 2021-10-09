@@ -20,7 +20,14 @@ fn main() {
     }
 
     cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
+    println!("[");
+    let mut results = [].to_vec();
     for query in &queries {
-        cli_runner::run_query(&cli_path.to_string(), &query.to_string());
+        results.push(cli_runner::run_query(
+            &cli_path.to_string(),
+            &query.to_string(),
+        ));
     }
+    println!("{}", results.join(","));
+    println!("]");
 }
