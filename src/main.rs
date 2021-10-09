@@ -1,10 +1,12 @@
 mod cli_runner;
 
 extern crate argparse;
+extern crate futures;
 use argparse::{ArgumentParser, Collect, Store};
-use std::thread;
+use futures::future::join_all;
 
-fn main() {
+#[tokio::main]
+pub async fn main() {
     let mut cli_path = "/Applications/Dash.app".to_string().to_owned();
     let mut queries: Vec<String> = [].to_vec();
     {
@@ -22,22 +24,19 @@ fn main() {
 
     cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
 
-    let mut threads = Vec::new();
-
     println!("[");
-    let mut results = [].to_vec();
+    let mut results: Vec<String> = Vec::new();
+    let mut futures = Vec::new();
     for query in &queries {
-        threads.push(thread::spawn(|| {
-            results.push(cli_runner::run_query(
-                &cli_path.to_string(),
-                &query.to_string(),
-            ));
-        }))
+        futures.push(cli_runner::run_query(&cli_path, &query));
     }
 
-    for thread in &threads {
-        thread.join();
-    }
-    println!("{}", results.join(","));
+    let all_futures = join_all(futures);
+    let futures_results = all_futures.await;
+    futures_results
+        .iter()
+        .for_each(|result| results.push(result.to_string()));
+
+    println!("{}", &results.join(","));
     println!("]");
 }
