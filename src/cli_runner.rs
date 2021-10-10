@@ -48,32 +48,30 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
     let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
 
     items_element.unwrap().children().for_each(|item| {
-        let item_value = item
-            .children()
-            .find(|child| {
-                child.tag_name().name() == "text" && child.attribute("type") == Some("copy")
-            })
-            .unwrap()
-            .first_child()
-            .unwrap()
-            .text()
-            .unwrap();
-        let mut title = item
-            .children()
-            .find(|child| child.tag_name().name() == "title")
-            .unwrap()
-            .text()
-            .unwrap()
-            .to_owned();
-        let subtitle = item
-            .children()
-            .filter(|child| child.tag_name().name() == "subtitle")
-            .last()
-            .unwrap()
-            .text()
-            .unwrap();
-        title.push_str(": ");
-        title.push_str(subtitle);
+        let relevant_tags = item.children().filter(|child| {
+            let tag_name = child.tag_name().name();
+            return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
+        });
+        let mut item_value: String = "".to_string();
+        let mut title: String = "".to_string();
+        let mut subtitle: String = "".to_string();
+        relevant_tags.for_each(|child| {
+            if child.tag_name().name() == "text" && child.attribute("type") == Some("copy") {
+                item_value = child.text().unwrap().to_string();
+            } else {
+                match child.tag_name().name() {
+                    "title" => title = child.text().unwrap().to_string(),
+                    "subtitle" => subtitle = child.text().unwrap().to_string(),
+                    _ => {}
+                }
+            }
+        });
+
+        assert_ne!(item_value, "");
+        assert_ne!(title, "");
+        assert_ne!(subtitle, "");
+
+        title = format!("{}: {}", title, subtitle);
 
         let mut keyword = "";
         if keyword_pattern.is_match(&query) {
