@@ -9,7 +9,7 @@ use std::{process::Command, string::FromUtf8Error};
 #[derive(Serialize)]
 pub struct TelescopeItem {
     pub value: String,
-    pub title: String,
+    pub ordinal: String,
     pub display: String,
     pub keyword: String,
 }
@@ -18,7 +18,7 @@ impl Clone for TelescopeItem {
     fn clone(&self) -> Self {
         return TelescopeItem {
             value: self.value.to_string(),
-            title: self.title.to_string(),
+            ordinal: self.ordinal.to_string(),
             display: self.display.to_string(),
             keyword: self.keyword.to_string(),
         };
@@ -83,7 +83,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
         }
         telescope_items.push(TelescopeItem {
             value: item_value.to_string(),
-            title: title.to_string(),
+            ordinal: title.to_string(),
             display: title.to_string(),
             keyword: keyword.to_string(),
         });
