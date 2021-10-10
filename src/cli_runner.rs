@@ -28,7 +28,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> String {
     let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
     let escape_quotes_regex = Regex::new(r#"""#).unwrap();
 
-    &items_element.unwrap().children().for_each(|item| {
+    items_element.unwrap().children().for_each(|item| {
         let item_value = item
             .children()
             .find(|child| {
