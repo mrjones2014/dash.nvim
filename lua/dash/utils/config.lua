@@ -4,6 +4,7 @@ local M = {}
 ---@class DashConfig
 M.config = {
   dash_app_path = '/Applications/Dash.app',
+  debounce = 1000,
   file_type_keywords = {
     dashboard = false,
     NvimTree = false,
@@ -60,11 +61,14 @@ M.config = {
   },
 }
 
+M.default_config = require('dash.utils.tables').deepcopy(M.config)
+
 --- Merge user config with default config
 ---@param new_config DashConfig
 function M.setup(new_config)
   new_config = new_config or {}
   M.config.dash_app_path = new_config.dash_app_path or M.config.dash_app_path
+  M.config.debounce = new_config.debounce or M.config.debounce
 
   if new_config.file_type_keywords == false then
     M.config.file_type_keywords = {}

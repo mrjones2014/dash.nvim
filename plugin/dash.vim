@@ -12,6 +12,9 @@ function s:run_with_bang(bang)
 endfunction
 
 command! -nargs=0 -bang Dash :call <SID>run_with_bang(<bang>0)
+
+let g:dash_root_dir = expand('<sfile>:p:h:h')
+
 lua require('telescope._extensions.dash')
 lua require('telescope').load_extension('dash')
 
