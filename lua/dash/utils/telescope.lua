@@ -1,49 +1,55 @@
 local M = {}
 
-local function get_results(prompt, keyword)
-  local stdout, stderr = require('dash.utils.jobs').run_search(prompt)
-
-  if stdout ~= nil then
-    local xmlUtils = require('dash.utils.xml')
-    return xmlUtils.transform_items(xmlUtils.parse(stdout), keyword)
-  end
-
-  if stderr ~= nil then
-    print(stderr)
-    return {}
-  end
-
-  print('Failed to execute Dash.app query')
-  return {}
-end
-
 local function get_results_for_filetype(current_file_type, prompt, bang)
   local config = require('dash.utils.config').config
   local file_type_keywords = config.file_type_keywords[current_file_type]
   if bang == true or not file_type_keywords then
+    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
+
     -- filtering by filetype is disabled
-    return get_results(prompt)
+    if stderr then
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      return vim.fn.json_decode(stdout)
+    end
   end
 
   if file_type_keywords == true then
     prompt = current_file_type .. ':' .. prompt
-    return get_results(prompt, current_file_type)
-  end
+    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
 
-  if type(file_type_keywords) == 'string' then
-    prompt = file_type_keywords .. ':' .. prompt
-    return get_results(prompt, file_type_keywords)
+    if stderr then
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      return vim.fn.json_decode(stdout)
+    end
   end
 
   if type(file_type_keywords) == 'table' then
-    local tableUtils = require('dash.utils.tables')
-    local results = {}
+    local queries = {}
     for _, value in ipairs(file_type_keywords) do
-      local keyword_prompt = value .. ':' .. prompt
-      results = tableUtils.concat_arrays(results, get_results(keyword_prompt, value))
+      table.insert(queries, value .. ':' .. prompt)
     end
-    return results
+
+    local stdout, stderr = require('dash.utils.jobs').run_queries(queries)
+
+    if stderr then
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      return vim.fn.json_decode(stdout)
+    end
   end
+
+  return {}
 end
 
 local function finder_fn(current_file_type, bang)
@@ -58,17 +64,13 @@ end
 
 local function attach_mappings(_, map)
   map('i', '<CR>', function(buffnr)
-    local entry = require('telescope.actions').get_selected_entry()
+    local entry = require('telescope.actions.state').get_selected_entry()
     if not entry then
       return
     end
-    local query = entry.value
-    if entry.keyword ~= nil and type(entry.keyword) == 'string' then
-      query = entry.keyword .. ':' .. query
-    end
     local jobs = require('dash.utils.jobs')
-    jobs.run_search(query)
-    jobs.open_query(query)
+    jobs.run_queries({ entry.query })
+    jobs.open_item(entry.value)
     require('telescope.actions').close(buffnr)
   end)
   return true
@@ -115,6 +117,7 @@ function M.build_picker(bang)
     prompt_title = build_picker_title(),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
+    debounce = require('dash.utils.config').config.debounce,
     attach_mappings = attach_mappings,
   })
 

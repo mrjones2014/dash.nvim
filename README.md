@@ -1,4 +1,4 @@
-![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg)
+![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org)
 
 # Dash.nvim
 
@@ -46,6 +46,8 @@ require('telescope').setup({
     dash = {
       -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
       dash_app_path = '/Applications/Dash.app',
+      -- debounce while typing, in milliseconds, defaults to 1000 (1 second)
+      debounce = 1000,
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
@@ -77,6 +79,12 @@ If you notice an issue with the default `file_type_keywords` or would like a new
 ---
 
 ## Contributing
+
+### Git Hooks
+
+If you plan on changing Rust code, you will need to install the git hooks via `make install-hooks`.
+The git hooks require you have a Rust toolchain installed. You can install a Rust toolchain from
+[rustup.rs](https://rustup.rs).
 
 ### Running Tests
 
