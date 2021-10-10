@@ -13,12 +13,20 @@ pub async fn run_query(cli_path: &String, query: &String) -> String {
     let output_result: Result<String, FromUtf8Error> = String::from_utf8(raw_output.stdout);
     assert_eq!(output_result.is_ok(), true);
     let output = output_result.unwrap();
-    let doc = Document::parse(&output).unwrap();
+
+    let mut json_items = [].to_vec();
+
+    let xml_result = Document::parse(&output);
+    let doc;
+    match xml_result {
+        Err(_) => return json_items.join(","),
+        Ok(value) => doc = value,
+    }
+
     let items_element = doc.descendants().find(|n| n.tag_name().name() == "items");
 
     let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
-
-    let mut json_items = [].to_vec();
+    let escape_quotes_regex = Regex::new(r#"""#).unwrap();
 
     &items_element.unwrap().children().for_each(|item| {
         let item_value = item
@@ -58,8 +66,11 @@ pub async fn run_query(cli_path: &String, query: &String) -> String {
                 .as_str();
         }
         let json_blob = format!(
-            "{{ \"value\": {:?}, \"display\": {:?}, \"ordinal\": {:?}, \"keyword\": {:?} }}",
-            item_value, title, title, keyword
+            "{{ \"value\": \"{}\", \"display\": \"{}\", \"ordinal\": \"{}\", \"keyword\": \"{}\" }}",
+            escape_quotes_regex.replace_all(&item_value, "\\\""),
+            escape_quotes_regex.replace_all(&title, "\\\""),
+            escape_quotes_regex.replace_all(&title, "\\\""),
+            escape_quotes_regex.replace_all(&keyword, "\\\"")
         );
         json_items.push(json_blob);
     });

@@ -27,6 +27,51 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
 
   if file_type_keywords == true then
     prompt = current_file_type .. ':' .. prompt
+    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
+
+    if stderr then
+      print('is it here')
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      -- print(vim.inspect(vim.fn.json_decode(stdout)))
+      return vim.fn.json_decode(stdout)
+    end
+  end
+
+  if type(file_type_keywords) == 'table' then
+    local queries = {}
+    for _, value in ipairs(file_type_keywords) do
+      table.insert(queries, value .. ':' .. prompt)
+    end
+
+    local stdout, stderr = require('dash.utils.jobs').run_queries(queries)
+
+    if stderr then
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      return vim.fn.json_decode(stdout)
+    end
+  end
+
+  return {}
+end
+
+--[[ local function get_results_for_filetype(current_file_type, prompt, bang)
+  local config = require('dash.utils.config').config
+  local file_type_keywords = config.file_type_keywords[current_file_type]
+  if bang == true or not file_type_keywords then
+    -- filtering by filetype is disabled
+    return get_results(prompt)
+  end
+
+  if file_type_keywords == true then
+    prompt = current_file_type .. ':' .. prompt
     return get_results(prompt, current_file_type)
   end
 
@@ -44,7 +89,7 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
     end
     return results
   end
-end
+end ]]
 
 local function finder_fn(current_file_type, bang)
   return function(prompt)
@@ -115,6 +160,7 @@ function M.build_picker(bang)
     prompt_title = build_picker_title(),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
+    debounce = require('dash.utils.config').config.debounce,
     attach_mappings = attach_mappings,
   })
 

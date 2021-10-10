@@ -33,9 +33,13 @@ pub async fn main() {
 
     let all_futures = join_all(futures);
     let futures_results = all_futures.await;
-    futures_results
-        .iter()
-        .for_each(|result| results.push(result.to_string()));
+    futures_results.iter().for_each(|result| {
+        let json = result.to_string();
+        if json.len() > 50 {
+            // min length of the JSON with all empty values
+            results.push(json)
+        }
+    });
 
     println!("{}", &results.join(","));
     println!("]");
