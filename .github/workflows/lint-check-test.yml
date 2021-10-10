@@ -1,4 +1,4 @@
-name: Lint, Check, and Test
+name: Run All Checks
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  lint-check-test:
-    name: Luacheck, Stylua, and Tests
+  check-lua:
+    name: Luacheck, Stylua, and Lua Tests
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -42,11 +42,14 @@ jobs:
     - name: Run tests
       run: make test
 
-    - name: Check Rust build
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-      run: |
-        make build-rust
-        git diff --exit-code bin/dash-nvim # checks that binary is up to date
+  check-rust:
+    name: Check Rust Binary Up to Date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: |
+          make build-rust
+          git diff --exit-code bin/dash-nvim
