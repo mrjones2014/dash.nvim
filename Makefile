@@ -12,3 +12,6 @@ build-rust:
 	cargo build --release
 	mkdir -p bin
 	cp target/release/dash-nvim bin/dash-nvim
+
+install-hooks:
+	git config core.hooksPath .githooks
