@@ -27,11 +27,12 @@ jobs:
     - name: Setup ‘luarocks’
       uses: leafo/gh-actions-luarocks@v4
 
-    - name: Run stylua
+    - name: Run luacheck
       run: |
         luarocks install luacheck
         luacheck .
 
+    - name: Run stylua --check
     - uses: actions/checkout@v2
     - uses: JohnnyMorganz/stylua-action@1.0.0
       with:
@@ -41,3 +42,12 @@ jobs:
 
     - name: Run tests
       run: make test
+
+    - name: Check Rust build
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - run: |
+        make build-rust
+        git diff --exit-code bin/dash-nvim # checks that binary is up to date
