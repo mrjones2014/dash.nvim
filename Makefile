@@ -8,10 +8,14 @@ watch: prepare
 	@echo -e '\nRunning tests on "spec/**/*_spec.lua" when any Lua file on "lua/" and "spec/" changes\n'
 	@find spec/ lua/ -name '*.lua' | entr make test
 
+clean:
+	@cargo clean
+
 build-rust:
-	cargo build --release
-	mkdir -p bin
-	cp target/release/dash-nvim bin/dash-nvim
+	@cargo build --release
+	@mkdir -p bin
+	@cp target/release/dash-nvim bin/dash-nvim
 
 install-hooks:
-	git config core.hooksPath .githooks
+	@git config core.hooksPath .githooks
+	@echo "Git hooks installed."
