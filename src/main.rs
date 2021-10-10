@@ -1,4 +1,5 @@
 mod cli_runner;
+mod constants;
 
 extern crate argparse;
 extern crate futures;
@@ -7,7 +8,7 @@ use futures::future::join_all;
 
 #[tokio::main]
 pub async fn main() {
-    let mut cli_path = "/Applications/Dash.app".to_string().to_owned();
+    let mut cli_path = constants::DASH_APP_BASE_PATH.to_owned();
     let mut queries: Vec<String> = [].to_vec();
     {
         let mut ap = ArgumentParser::new();
@@ -22,7 +23,7 @@ pub async fn main() {
         ap.parse_args_or_exit();
     }
 
-    cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
+    cli_path.push_str(constants::DASH_APP_CLI_PATH);
 
     print!("[");
     let mut results: Vec<String> = Vec::new();

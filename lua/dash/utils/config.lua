@@ -61,6 +61,8 @@ M.config = {
   },
 }
 
+M.default_config = require('dash.utils.tables').deepcopy(M.config)
+
 --- Merge user config with default config
 ---@param new_config DashConfig
 function M.setup(new_config)
