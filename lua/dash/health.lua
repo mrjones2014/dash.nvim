@@ -1,5 +1,10 @@
 local M = {}
 
+local function build_cli_path(dash_app_path)
+  -- gsub to remove trailing slash, if there is one, because we're adding one
+  return (dash_app_path:gsub('(.)%/$', '%1')) .. '/Contents/Resources/dashAlfredWorkflow'
+end
+
 function M.check()
   local health_start = vim.fn['health#report_start']
   local health_ok = vim.fn['health#report_ok']
@@ -27,14 +32,13 @@ function M.check()
   health_start('Configuration')
   local config = require('dash.utils.config').config
   local dash_app_path = config.dash_app_path
-  local jobutil = require('dash.utils.jobs')
-  local cli_path = jobutil.build_cli_path(dash_app_path)
+  local cli_path = build_cli_path(dash_app_path)
   if vim.fn.executable(cli_path) ~= 0 then
     health_ok('Dash.app found and executable at configured path: ' .. dash_app_path)
   else
     health_error('Dash.app not found at configured path: ' .. dash_app_path)
 
-    if vim.fn.executable(jobutil.build_cli_path('/Applications/Dash.app')) == 0 then
+    if vim.fn.executable(build_cli_path('/Applications/Dash.app')) == 0 then
       health_info('Dash.app found and executable at default path: /Applications/Dash.app')
     end
   end

@@ -1,28 +1,21 @@
 local M = {}
 
-local function get_results(prompt, keyword)
-  local stdout, stderr = require('dash.utils.jobs').run_search(prompt)
-
-  if stdout ~= nil then
-    local xmlUtils = require('dash.utils.xml')
-    return xmlUtils.transform_items(xmlUtils.parse(stdout), keyword)
-  end
-
-  if stderr ~= nil then
-    print(stderr)
-    return {}
-  end
-
-  print('Failed to execute Dash.app query')
-  return {}
-end
-
 local function get_results_for_filetype(current_file_type, prompt, bang)
   local config = require('dash.utils.config').config
   local file_type_keywords = config.file_type_keywords[current_file_type]
   if bang == true or not file_type_keywords then
+    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
+
     -- filtering by filetype is disabled
-    return get_results(prompt)
+    if stderr then
+      print('is it here')
+      print(stderr)
+      return {}
+    end
+
+    if stdout then
+      return vim.fn.json_decode(stdout)
+    end
   end
 
   if file_type_keywords == true then
@@ -36,7 +29,6 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
     end
 
     if stdout then
-      -- print(vim.inspect(vim.fn.json_decode(stdout)))
       return vim.fn.json_decode(stdout)
     end
   end
@@ -62,35 +54,6 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
   return {}
 end
 
---[[ local function get_results_for_filetype(current_file_type, prompt, bang)
-  local config = require('dash.utils.config').config
-  local file_type_keywords = config.file_type_keywords[current_file_type]
-  if bang == true or not file_type_keywords then
-    -- filtering by filetype is disabled
-    return get_results(prompt)
-  end
-
-  if file_type_keywords == true then
-    prompt = current_file_type .. ':' .. prompt
-    return get_results(prompt, current_file_type)
-  end
-
-  if type(file_type_keywords) == 'string' then
-    prompt = file_type_keywords .. ':' .. prompt
-    return get_results(prompt, file_type_keywords)
-  end
-
-  if type(file_type_keywords) == 'table' then
-    local tableUtils = require('dash.utils.tables')
-    local results = {}
-    for _, value in ipairs(file_type_keywords) do
-      local keyword_prompt = value .. ':' .. prompt
-      results = tableUtils.concat_arrays(results, get_results(keyword_prompt, value))
-    end
-    return results
-  end
-end ]]
-
 local function finder_fn(current_file_type, bang)
   return function(prompt)
     if not prompt or #prompt == 0 then
@@ -112,7 +75,7 @@ local function attach_mappings(_, map)
       query = entry.keyword .. ':' .. query
     end
     local jobs = require('dash.utils.jobs')
-    jobs.run_search(query)
+    jobs.run_queries({ query })
     jobs.open_query(query)
     require('telescope.actions').close(buffnr)
   end)
