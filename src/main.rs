@@ -4,6 +4,7 @@ mod constants;
 extern crate argparse;
 extern crate futures;
 use argparse::{ArgumentParser, Collect, Store};
+use cli_runner::TelescopeItem;
 use futures::future::join_all;
 
 #[tokio::main]
@@ -25,8 +26,7 @@ pub async fn main() {
 
     cli_path.push_str(constants::DASH_APP_CLI_PATH);
 
-    print!("[");
-    let mut results: Vec<String> = Vec::new();
+    let mut results: Vec<TelescopeItem> = Vec::new();
     let mut futures = Vec::new();
     for query in &queries {
         futures.push(cli_runner::run_query(&cli_path, &query));
@@ -35,13 +35,10 @@ pub async fn main() {
     let all_futures = join_all(futures);
     let futures_results = all_futures.await;
     futures_results.iter().for_each(|result| {
-        let json = result.to_string();
-        if json.len() > 50 {
-            // min length of the JSON with all empty values
-            results.push(json)
+        if result.len() > 0 {
+            results.append(&mut result.to_owned());
         }
     });
 
-    print!("{}", &results.join(","));
-    print!("]");
+    print!("{}", serde_json::to_string(&results).unwrap());
 }
