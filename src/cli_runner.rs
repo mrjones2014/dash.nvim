@@ -2,11 +2,11 @@ extern crate roxmltree;
 
 use regex::Regex;
 use roxmltree::Document;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct TelescopeItem {
     pub value: String,
     pub title: String,
