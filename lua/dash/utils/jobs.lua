@@ -1,6 +1,6 @@
 local M = {}
 
-local dash_nvim_cli_path = vim.g.dash_root_dir .. '/bin/dash-nvim'
+local dash_nvim_cli_path = vim.g.dash_root_dir .. require('dash.constants').dash_nvim_bin_path
 
 --- Run queries and return stdout, stderr, in JSON format
 ---@param queries table @a table containing all queries to run as strings
