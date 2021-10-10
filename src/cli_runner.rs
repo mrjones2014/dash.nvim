@@ -55,16 +55,15 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
         let mut item_value: String = "".to_string();
         let mut title: String = "".to_string();
         let mut subtitle: String = "".to_string();
-        relevant_tags.for_each(|child| {
-            if child.tag_name().name() == "text" && child.attribute("type") == Some("copy") {
-                item_value = child.text().unwrap().to_string();
-            } else {
-                match child.tag_name().name() {
-                    "title" => title = child.text().unwrap().to_string(),
-                    "subtitle" => subtitle = child.text().unwrap().to_string(),
-                    _ => {}
+        relevant_tags.for_each(|child| match child.tag_name().name() {
+            "text" => {
+                if child.attribute("type") == Some("copy") {
+                    item_value = child.text().unwrap().to_string()
                 }
             }
+            "title" => title = child.text().unwrap().to_string(),
+            "subtitle" => subtitle = child.text().unwrap().to_string(),
+            _ => {}
         });
 
         assert_ne!(item_value, "");
