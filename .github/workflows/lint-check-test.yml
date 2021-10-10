@@ -48,6 +48,6 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-    - run: |
+      run: |
         make build-rust
         git diff --exit-code bin/dash-nvim # checks that binary is up to date
