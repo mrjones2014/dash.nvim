@@ -32,7 +32,6 @@ jobs:
         luarocks install luacheck
         luacheck .
 
-    - name: Run stylua --check
     - uses: actions/checkout@v2
     - uses: JohnnyMorganz/stylua-action@1.0.0
       with:
