@@ -8,7 +8,6 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
 
     -- filtering by filetype is disabled
     if stderr then
-      print('is it here')
       print(stderr)
       return {}
     end
@@ -23,7 +22,6 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
     local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
 
     if stderr then
-      print('is it here')
       print(stderr)
       return {}
     end
@@ -66,17 +64,13 @@ end
 
 local function attach_mappings(_, map)
   map('i', '<CR>', function(buffnr)
-    local entry = require('telescope.actions').get_selected_entry()
+    local entry = require('telescope.actions.state').get_selected_entry()
     if not entry then
       return
     end
-    local query = entry.value
-    if entry.keyword ~= nil and type(entry.keyword) == 'string' then
-      query = entry.keyword .. ':' .. query
-    end
     local jobs = require('dash.utils.jobs')
-    jobs.run_queries({ query })
-    jobs.open_query(query)
+    jobs.run_queries({ entry.query })
+    jobs.open_item(entry.value)
     require('telescope.actions').close(buffnr)
   end)
   return true
