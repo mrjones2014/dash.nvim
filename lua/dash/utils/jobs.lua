@@ -35,14 +35,14 @@ function M.run_queries(queries)
 end
 
 --- Open the query in Dash.app
----@param query string
-function M.open_query(query)
+---@param item_num string
+function M.open_item(item_num)
   local Job = require('plenary.job')
 
   Job
     :new({
       command = 'open',
-      args = { '-g', ('dash-workflow-callback://' .. require('dash.utils.strings').urlencode(query)) },
+      args = { '-g', ('dash-workflow-callback://' .. item_num) },
     })
     :start()
 end

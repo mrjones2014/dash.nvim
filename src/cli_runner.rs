@@ -12,6 +12,7 @@ pub struct TelescopeItem {
     pub ordinal: String,
     pub display: String,
     pub keyword: String,
+    pub query: String,
 }
 
 impl Clone for TelescopeItem {
@@ -21,6 +22,7 @@ impl Clone for TelescopeItem {
             ordinal: self.ordinal.to_string(),
             display: self.display.to_string(),
             keyword: self.keyword.to_string(),
+            query: self.query.to_string(),
         };
     }
 }
@@ -52,15 +54,10 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
             let tag_name = child.tag_name().name();
             return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
         });
-        let mut item_value: String = "".to_string();
+        let item_value: String = item.attribute("arg").unwrap().to_string();
         let mut title: String = "".to_string();
         let mut subtitle: String = "".to_string();
         relevant_tags.for_each(|child| match child.tag_name().name() {
-            "text" => {
-                if child.attribute("type") == Some("copy") {
-                    item_value = child.text().unwrap().to_string()
-                }
-            }
             "title" => title = child.text().unwrap().to_string(),
             "subtitle" => subtitle = child.text().unwrap().to_string(),
             _ => {}
@@ -86,6 +83,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
             ordinal: title.to_string(),
             display: title.to_string(),
             keyword: keyword.to_string(),
+            query: query.to_string(),
         });
     });
     return telescope_items;
