@@ -52,4 +52,3 @@ jobs:
           toolchain: stable
       - run: |
           make build-rust
-          git diff --exit-code bin/dash-nvim
