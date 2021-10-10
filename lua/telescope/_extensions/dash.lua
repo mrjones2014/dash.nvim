@@ -6,8 +6,8 @@ return require('telescope').register_extension({
     require('dash.health').check()
   end,
   exports = {
-    search = function()
-      require('dash').search()
+    search = function(bang)
+      require('dash').search(bang)
     end,
     search_no_filter = function()
       require('dash').search(true)
