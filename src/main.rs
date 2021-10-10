@@ -24,7 +24,7 @@ pub async fn main() {
 
     cli_path.push_str("/Contents/Resources/dashAlfredWorkflow");
 
-    println!("[");
+    print!("[");
     let mut results: Vec<String> = Vec::new();
     let mut futures = Vec::new();
     for query in &queries {
@@ -41,6 +41,6 @@ pub async fn main() {
         }
     });
 
-    println!("{}", &results.join(","));
-    println!("]");
+    print!("{}", &results.join(","));
+    print!("]");
 }
