@@ -100,8 +100,10 @@ local function build_picker_title()
 end
 
 --- Build a Telescope picker for Dash.app and return it
+---@param bang boolean @bang disables filtering by filetype
+---@param initial_text string @pre-fill text into the telescope prompt
 ---@return table @Telescope Picker, has :find() method
-function M.build_picker(bang)
+function M.build_picker(bang, initial_text)
   local Picker = require('telescope.pickers')
   local Finder = require('telescope.finders')
   local Sorter = require('telescope.sorters')
@@ -119,6 +121,7 @@ function M.build_picker(bang)
     sorter = Sorter.get_generic_fuzzy_sorter(),
     debounce = require('dash.utils.config').config.debounce,
     attach_mappings = attach_mappings,
+    default_text = initial_text,
   })
 
   return picker
