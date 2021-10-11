@@ -10,22 +10,32 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Usage
 
-The main entry point to the picker is `require('dash').search()`. This function accepts two arguments:
+### Editor Commands
+
+This plugin has two editor commands, `:Dash` and `:DashWord`, each of which accept a bang (`!`). By default, it will
+search Dash.app with keywords based on config (see `file_type_keywords` in [configuration](#configuration)). The bang (`!`)
+will search without this keyword filtering.
+
+`:Dash [query]` will open the Telescope picker, and if `[query]` is passed, it will pre-fill the prompt with `[query]`.
+
+`:DashWord` will open the Telescope picker and pre-fill the prompt with the word under the cursor.
+
+### Lua API
+
+The public API consists of two main functions.
+
+```lua
+-- See lua/dash/utils/config.lua for full DashConfig type definition
+-- Also described in configuration section below
+---@param config DashConfig
+require('dash').setup(config)
+```
 
 ```lua
 ---@param bang boolean @bang searches without any filtering
 ---@param initial_text string @pre-fill text into the telescope picker
-function search(bang, initial_text)
+require('dash').search(bang, initial_text)
 ```
-
-There are also two editor commands, each accepting a `bang` (`!`):
-
-- `:Dash` runs `:lua require('dash').search()` -- search Dash.app in Telescope
-- `:Dash!` runs `:lua require('dash').search(true)` -- Search without filtering by filetype
-- `:DashWord` runs `:lua require('dash').search(false, vim.fn.expand('<cword>))` -- Search word under cursor
-- `:DashWord!` runs `:lua require('dash').search(true, vim.fn.expand('<cword>'))` -- Search word under cursor without filtering by filetype
-
-This plugin also adds filetype detection for [Handlebars](https://handlebarsjs.com) (`.hbs` files) in order to search the Handlebars docset.
 
 ## Install
 
