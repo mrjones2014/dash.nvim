@@ -7,12 +7,11 @@ Once this is installed, you should be able to build via `make build-rust`.
 
 ## Arguments
 
-There is one named argument, and one positional argument. The `-c` argument can be
-used to specify the install location of Dash.app if using a non-standard install location.
-If not passed, it defaults to `/Applications/Dash.app`.
-
-The positional argument is the queries to be run. You can pass multiple queries at once. They
-must be quoted if the query contains spaces.
+| Argument Flag                                 | Argument Name  | Description                                                                                  | Required |
+| --------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------- | :------: |
+| `-c`                                          | `cli_path`     | Path to Dash.app if using a non-standard path, defaults to `/Applications/Dash.app`          |          |
+| `--pretty-print`                              | `pretty_print` | Pretty-print the JSON output, useful for debugging purposes, defaults to `false`             |          |
+| (positional, must come after other arguments) | `queries`      | A space-separated list of queries to run, queries can contain spaces if surrounded in quotes |    ✅    |
 
 ### Examples
 
@@ -21,6 +20,10 @@ must be quoted if the query contains spaces.
 `bin/dash-nvim "typescript:array.prototype.filter" "javascript:array.prototype.filter" "nodejs:array.prototype.filter"`
 
 `bin/dash-nvim "array.prototype.filter"`
+
+`bin/dash-nvim --pretty-print "array.prototype.filter"`
+
+`bin/dash-nvim -c /path/to/Dash.app --pretty-print "array.prototype.filter"`
 
 ## Output
 
