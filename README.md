@@ -85,6 +85,10 @@ require('telescope').setup({
 
 If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
 
+## Rust Backend
+
+If you'd like to use the Rust backend directly to build something else, see [BACKEND.md](./BACKEND.md).
+
 ---
 
 ## Contributing
