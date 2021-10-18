@@ -44,9 +44,11 @@ fn query_sync(params: &'static QueryParams) -> Vec<TelescopeItem> {
     return rx.recv().unwrap().to_owned().to_vec();
 }
 
-fn query_sync_lua_table<'a>(lua: &'a Lua, params: &'a QueryParams) -> LuaTable<'a> {
+fn query_sync_lua_table<'a>(lua: &'a Lua, params: &'static QueryParams) -> LuaTable<'a> {
     let result_telescope_items = query_sync(params);
     let mut lua_table_items: Vec<LuaTable> = Vec::new();
+    let mut lua_result_list: LuaTable = lua.create_table().unwrap();
+    let mut i = 1;
     result_telescope_items.iter().for_each(|result| {
         let result_lua_table = lua.create_table().unwrap();
         result_lua_table.set("value", result.value.to_string());
@@ -56,18 +58,15 @@ fn query_sync_lua_table<'a>(lua: &'a Lua, params: &'a QueryParams) -> LuaTable<'
         result_lua_table.set("query", result.query.to_string());
 
         lua_table_items.push(result_lua_table);
+        lua_result_list.raw_insert(i, result_lua_table.to_owned());
     });
 
-    let results_list = lua
-        .create_table_from(lua_table_items.iter().enumerate())
-        .unwrap();
-
-    return results_list;
+    return lua_result_list.to_owned();
 }
 
 #[mlua::lua_module]
 fn dash_runner(lua: &Lua) -> LuaResult<LuaTable> {
-    let exports = lua.create_table();
-    exports.set("query", lua.create_function(query_sync_lua_table)?)?;
-    return Ok(exports.unwrap());
+    let mut exports = lua.create_table().unwrap();
+    exports.set("query", lua.create_function(query_sync_lua_table));
+    return Ok(exports);
 }
