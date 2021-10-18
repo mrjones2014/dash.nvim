@@ -29,15 +29,24 @@ struct LuaTableShim(*const c_void);
 unsafe impl Send for LuaTableShim {}
 unsafe impl Sync for LuaTableShim {}
 
-pub struct QueryParams<'a> {
-    pub cli_path: &'a String,
-    pub queries: &'a Vec<String>,
+pub struct QueryParams {
+    pub cli_path: &'static String,
+    pub queries: &'static Vec<String>,
 }
 
-impl mlua::UserData for QueryParams<'static> {
+impl mlua::UserData for QueryParams {
     fn add_fields<'lua, F: LuaUserDataFields<'lua, Self>>(_fields: &mut F) {}
 
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(_methods: &mut M) {}
+}
+
+impl Clone for QueryParams {
+    fn clone(&self) -> Self {
+        return QueryParams {
+            cli_path: &self.cli_path.to_string(),
+            queries: &self.queries.clone(),
+        };
+    }
 }
 
 fn query_sync(params: &'static QueryParams) -> Vec<TelescopeItem> {
@@ -50,11 +59,8 @@ fn query_sync(params: &'static QueryParams) -> Vec<TelescopeItem> {
     return rx.recv().unwrap().to_owned().to_vec();
 }
 
-fn query_sync_lua_table<'a>(
-    lua: &'a Lua,
-    params: &'static QueryParams,
-) -> Result<mlua::Table<'a>, LuaTable<'a>> {
-    let result_telescope_items = query_sync(params);
+fn query_sync_lua_table<'a>(lua: &'a Lua, params: QueryParams) -> LuaTable<'a> {
+    let result_telescope_items = query_sync(&params);
     let mut lua_table_items: Vec<LuaTable> = Vec::new();
     let mut lua_result_list: LuaTable = lua.create_table().unwrap();
     let mut i = 1;
@@ -70,7 +76,7 @@ fn query_sync_lua_table<'a>(
         lua_result_list.raw_insert(i, result_lua_table.to_owned());
     });
 
-    return Ok(lua_result_list.to_owned());
+    return lua_result_list.to_owned();
 }
 
 #[mlua::lua_module]
