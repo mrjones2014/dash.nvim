@@ -3,11 +3,9 @@ use cli_runner::TelescopeItem;
 use crossbeam::channel;
 use futures::future::join_all;
 use mlua::prelude::*;
-use std::ffi::c_void;
-use std::marker::{Send, Sync};
 use tokio::runtime::Runtime;
 
-async fn query<'a>(cli_path: &'a String, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
+pub async fn query<'a>(cli_path: &'a String, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
     let mut results: Vec<TelescopeItem> = Vec::new();
     let mut futures = Vec::new();
     queries.iter().for_each(|query| {
@@ -25,10 +23,6 @@ async fn query<'a>(cli_path: &'a String, queries: &'a Vec<String>) -> Vec<Telesc
     return results;
 }
 
-struct LuaTableShim(*const c_void);
-unsafe impl Send for LuaTableShim {}
-unsafe impl Sync for LuaTableShim {}
-
 #[derive(Clone)]
 pub struct QueryParams {
     pub cli_path: &'static String,
@@ -41,7 +35,7 @@ impl mlua::UserData for QueryParams {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(_methods: &mut M) {}
 }
 
-fn query_sync(params: QueryParams) -> Vec<TelescopeItem> {
+pub fn query_sync(params: QueryParams) -> Vec<TelescopeItem> {
     let (tx, rx) = channel::bounded(1);
     let runtime = Runtime::new().unwrap();
     let handle = runtime.handle();
@@ -52,7 +46,10 @@ fn query_sync(params: QueryParams) -> Vec<TelescopeItem> {
     return rx.recv().unwrap().to_owned().to_vec();
 }
 
-fn query_sync_lua_table<'a>(lua: &'a Lua, params: QueryParams) -> Result<LuaTable<'a>, LuaError> {
+pub fn query_sync_lua_table<'a>(
+    lua: &'a Lua,
+    params: QueryParams,
+) -> Result<LuaTable<'a>, LuaError> {
     let result_telescope_items = query_sync(params);
     let mut lua_table_items: Vec<LuaTable> = Vec::new();
     let lua_result_list: LuaTable = lua.create_table().unwrap();
@@ -86,7 +83,7 @@ fn query_sync_lua_table<'a>(lua: &'a Lua, params: QueryParams) -> Result<LuaTabl
 }
 
 #[mlua::lua_module]
-fn dash_runner(lua: &Lua) -> LuaResult<LuaTable> {
+pub fn dash_runner(lua: &Lua) -> LuaResult<LuaTable> {
     let exports = lua.create_table().unwrap();
     exports
         .set("query", lua.create_function(query_sync_lua_table).unwrap())
