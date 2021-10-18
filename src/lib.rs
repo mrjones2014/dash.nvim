@@ -34,6 +34,12 @@ pub struct QueryParams<'a> {
     pub queries: &'a Vec<String>,
 }
 
+impl mlua::UserData for QueryParams<'static> {
+    fn add_fields<'lua, F: LuaUserDataFields<'lua, Self>>(_fields: &mut F) {}
+
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(_methods: &mut M) {}
+}
+
 fn query_sync(params: &'static QueryParams) -> Vec<TelescopeItem> {
     let (tx, rx) = channel::bounded(1);
     let handle = Runtime::new().unwrap().handle();
@@ -44,7 +50,10 @@ fn query_sync(params: &'static QueryParams) -> Vec<TelescopeItem> {
     return rx.recv().unwrap().to_owned().to_vec();
 }
 
-fn query_sync_lua_table<'a>(lua: &'a Lua, params: &'static QueryParams) -> LuaTable<'a> {
+fn query_sync_lua_table<'a>(
+    lua: &'a Lua,
+    params: &'static QueryParams,
+) -> Result<mlua::Table<'a>, LuaTable<'a>> {
     let result_telescope_items = query_sync(params);
     let mut lua_table_items: Vec<LuaTable> = Vec::new();
     let mut lua_result_list: LuaTable = lua.create_table().unwrap();
@@ -61,12 +70,12 @@ fn query_sync_lua_table<'a>(lua: &'a Lua, params: &'static QueryParams) -> LuaTa
         lua_result_list.raw_insert(i, result_lua_table.to_owned());
     });
 
-    return lua_result_list.to_owned();
+    return Ok(lua_result_list.to_owned());
 }
 
 #[mlua::lua_module]
 fn dash_runner(lua: &Lua) -> LuaResult<LuaTable> {
     let mut exports = lua.create_table().unwrap();
-    exports.set("query", lua.create_function(query_sync_lua_table));
+    exports.set("query", lua.create_function(query_sync_lua_table).unwrap());
     return Ok(exports);
 }
