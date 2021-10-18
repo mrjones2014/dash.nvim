@@ -13,8 +13,7 @@ clean:
 
 build-rust:
 	@cargo build --release
-	@mkdir -p bin
-	@cp target/release/dash-nvim bin/dash-nvim
+	@mv ./target/release/libdash_nvim.dylib lua/dash_lib.so
 
 install-hooks:
 	@git config core.hooksPath .githooks
