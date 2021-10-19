@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 make build-rust
-git add lua/*.so
+git add ./bin/
