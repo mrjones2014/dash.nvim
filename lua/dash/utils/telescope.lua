@@ -1,6 +1,6 @@
 local M = {}
 
-local cli_path = require('dash.utils.config').config.dash_app_path .. require('dash.constants').dash_app_cli_path
+local cli_path = require('dash.utils.config').config.dash_app_path .. require('libdash_nvim').DASH_APP_CLI_PATH
 
 local function get_results_for_filetype(current_file_type, prompt, bang)
   local config = require('dash.utils.config').config
