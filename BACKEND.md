@@ -5,29 +5,24 @@ The Rust backend is a command-line interface. A pre-built binary can be found at
 To build from source, you will need a Rust toolchain, which can be installed from [rustup.rs](https://rustup.rs).
 Once this is installed, you should be able to build via `make build-rust`.
 
-## Arguments
+## API
 
-| Argument Flag                                 | Argument Name  | Description                                                                                  | Required |
-| --------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------- | :------: |
-| `-c`                                          | `cli_path`     | Path to Dash.app if using a non-standard path, defaults to `/Applications/Dash.app`          |          |
-| `--pretty-print`                              | `pretty_print` | Pretty-print the JSON output, useful for debugging purposes, defaults to `false`             |          |
-| (positional, must come after other arguments) | `queries`      | A space-separated list of queries to run, queries can contain spaces if surrounded in quotes |    ✅    |
+The Rust backend is exposed as a Lua module. To `require` the module, you will need to have the file `libdash_nvim.so` for your architecture (M1 or Intel)
+on your runtimepath, as well as the `deps` directory, which must be in the same directory as the `libdash_nvim.so` shared library file.
 
-### Examples
+The Lua module exports one method, `query`, that takes a list of strings. The first item must be the path to the Dash.app CLI, e.g. `/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow`.
 
-`bin/dash-nvim -c /path/to/Dash.app "typescript:array.prototype.filter" "javascript:array.prototype.filter" "nodejs:array.prototype.filter"`
+Example:
 
-`bin/dash-nvim "typescript:array.prototype.filter" "javascript:array.prototype.filter" "nodejs:array.prototype.filter"`
+```lua
+local results = require('libdash_nvim').query({
+  '/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow',
+  'javascript:array.prototype.filter',
+  'typescript:array.prototype.filter',
+})
+```
 
-`bin/dash-nvim "array.prototype.filter"`
-
-`bin/dash-nvim --pretty-print "array.prototype.filter"`
-
-`bin/dash-nvim -c /path/to/Dash.app --pretty-print "array.prototype.filter"`
-
-## Output
-
-The CLI outputs a JSON array of objects. Each object has the following properties:
+The `query` method returns a table with the following properties:
 
 - `value` -- the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
 - `ordinal` -- a value to sort by, currently this is the same value as `display`
