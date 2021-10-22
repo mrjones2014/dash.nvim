@@ -12,9 +12,9 @@ Query [Dash.app](https://kapeli.com/dash) within Neovim with a Telescope picker!
 
 ![demo](./images/demo.gif)
 
-<!-- panvimdoc-ignore-end -->
-
 The theme used in the recording is [lighthaus.nvim](https://github.com/mrjones2014/lighthaus.nvim).
+
+<!-- panvimdoc-ignore-end -->
 
 Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
