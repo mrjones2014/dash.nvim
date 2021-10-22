@@ -5,12 +5,14 @@ use futures::future::join_all;
 use mlua::prelude::*;
 use tokio::runtime::Runtime;
 
-pub async fn query<'a>(cli_path: &'a String, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
+pub async fn query<'a>(queries: &'a Vec<String>) -> Vec<TelescopeItem> {
     let mut results: Vec<TelescopeItem> = Vec::new();
     let mut futures = Vec::new();
-    queries.iter().for_each(|query| {
+    let cli_path = queries.get(0).unwrap();
+    for i in 1..queries.len() {
+        let query = queries.get(i).unwrap();
         futures.push(cli_runner::run_query(&cli_path, &query));
-    });
+    }
 
     let all_futures = join_all(futures);
     let futures_results = all_futures.await;
@@ -23,24 +25,20 @@ pub async fn query<'a>(cli_path: &'a String, queries: &'a Vec<String>) -> Vec<Te
     return results;
 }
 
-#[derive(Clone)]
-pub struct QueryParams {
-    pub cli_path: &'static String,
-    pub queries: &'static Vec<String>,
-}
+// #[derive(Clone)]
+// pub struct QueryParams {
+//     pub cli_path: &'static String,
+//     pub queries: &'static Vec<String>,
+// }
 
-impl mlua::UserData for QueryParams {
-    fn add_fields<'lua, F: LuaUserDataFields<'lua, Self>>(_fields: &mut F) {}
+// impl mlua::UserData for QueryParams {}
 
-    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(_methods: &mut M) {}
-}
-
-pub fn query_sync(params: QueryParams) -> Vec<TelescopeItem> {
+pub fn query_sync(params: Vec<String>) -> Vec<TelescopeItem> {
     let (tx, rx) = channel::bounded(1);
     let runtime = Runtime::new().unwrap();
     let handle = runtime.handle();
     handle.spawn(async move {
-        let result_table = &query(&params.cli_path, &params.queries).await;
+        let result_table = &query(&params).await;
         let _ = tx.send(result_table.clone());
     });
     return rx.recv().unwrap().to_owned().to_vec();
@@ -48,7 +46,7 @@ pub fn query_sync(params: QueryParams) -> Vec<TelescopeItem> {
 
 pub fn query_sync_lua_table<'a>(
     lua: &'a Lua,
-    params: QueryParams,
+    params: Vec<String>,
 ) -> Result<LuaTable<'a>, LuaError> {
     let result_telescope_items = query_sync(params);
     let mut lua_table_items: Vec<LuaTable> = Vec::new();

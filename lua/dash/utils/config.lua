@@ -4,7 +4,7 @@ local M = {}
 ---@class DashConfig
 M.config = {
   dash_app_path = '/Applications/Dash.app',
-  debounce = 750,
+  debounce = 500,
   file_type_keywords = {
     dashboard = false,
     NvimTree = false,
