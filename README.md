@@ -12,6 +12,8 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Usage
 
+Run `:h dash-nvim` to see these docs in Neovim.
+
 ### Editor Commands
 
 This plugin has two editor commands, `:Dash` and `:DashWord`, each of which accept a bang (`!`). By default, it will
