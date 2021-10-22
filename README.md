@@ -107,7 +107,7 @@ If you notice an issue with the default `file_type_keywords` or would like a new
 
 The binaries for the Rust backend can be found under `bin/`, compiled for Mac M1 and Intel architectures.
 To build from source, you will need a Rust toolchain, which can be installed from [rustup.rs](https://rustup.rs).
-Once this is installed, you should be able to build via `make build-rust`. Then, `make install` will copy the correct
+Once this is installed, you should be able to build via `make build`. Then, `make install` will copy the correct
 binary into the `lua/` directory so that it is added to Lua's runtimepath.
 
 The Rust backend is exposed as a Lua module. To `require` the module, you will need to have the file `libdash_nvim.so` for your architecture (M1 or Intel)
