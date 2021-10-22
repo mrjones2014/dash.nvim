@@ -137,8 +137,6 @@ The `query` method returns a table with the following properties:
 the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the CLI again with
 only the `query` value from the selected item, then opening `dash-workflow-callback://[value]`.
 
-If you'd like to use the Rust backend directly to build something else, see [BACKEND.md](./BACKEND.md).
-
 ---
 
 ## Contributing
