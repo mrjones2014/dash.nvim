@@ -25,7 +25,7 @@ jobs:
       - name: panvimdoc
         uses: kdheepak/panvimdoc@v2.7.1
         with:
-          vimdoc: dash
+          vimdoc: dash-nvim
           description: Search Dash.app from Neovim with Telescope. Built with Lua and Rust.
       - name: Create PR
         run: |
