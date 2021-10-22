@@ -25,14 +25,6 @@ pub async fn query<'a>(queries: &'a Vec<String>) -> Vec<TelescopeItem> {
     return results;
 }
 
-// #[derive(Clone)]
-// pub struct QueryParams {
-//     pub cli_path: &'static String,
-//     pub queries: &'static Vec<String>,
-// }
-
-// impl mlua::UserData for QueryParams {}
-
 pub fn query_sync(params: Vec<String>) -> Vec<TelescopeItem> {
     let (tx, rx) = channel::bounded(1);
     let runtime = Runtime::new().unwrap();
