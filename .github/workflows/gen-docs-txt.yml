@@ -6,7 +6,7 @@ on:
 
 jobs:
   gen-docs:
-    name: Autogenerate docs/dash.txt
+    name: Autogenerate doc/dash.txt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
