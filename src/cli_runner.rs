@@ -2,11 +2,9 @@ extern crate roxmltree;
 
 use regex::Regex;
 use roxmltree::Document;
-use serde::Serialize;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
-#[derive(Serialize)]
 pub struct TelescopeItem {
     pub value: String,
     pub ordinal: String,

@@ -1,34 +1,23 @@
 local M = {}
 
+local cli_path = require('dash.utils.config').config.dash_app_path .. require('dash.constants').dash_app_cli_path
+
 local function get_results_for_filetype(current_file_type, prompt, bang)
   local config = require('dash.utils.config').config
   local file_type_keywords = config.file_type_keywords[current_file_type]
   if bang == true or not file_type_keywords then
-    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
-
-    -- filtering by filetype is disabled
-    if stderr then
-      print(stderr)
-      return {}
-    end
-
-    if stdout then
-      return vim.fn.json_decode(stdout)
-    end
+    return require('libdash_nvim').query({
+      cli_path,
+      prompt,
+    })
   end
 
   if file_type_keywords == true then
     prompt = current_file_type .. ':' .. prompt
-    local stdout, stderr = require('dash.utils.jobs').run_queries({ prompt })
-
-    if stderr then
-      print(stderr)
-      return {}
-    end
-
-    if stdout then
-      return vim.fn.json_decode(stdout)
-    end
+    return require('libdash_nvim').query({
+      cli_path,
+      prompt,
+    })
   end
 
   if type(file_type_keywords) == 'table' then
@@ -37,16 +26,9 @@ local function get_results_for_filetype(current_file_type, prompt, bang)
       table.insert(queries, value .. ':' .. prompt)
     end
 
-    local stdout, stderr = require('dash.utils.jobs').run_queries(queries)
+    table.insert(queries, 1, cli_path)
 
-    if stderr then
-      print(stderr)
-      return {}
-    end
-
-    if stdout then
-      return vim.fn.json_decode(stdout)
-    end
+    return require('libdash_nvim').query(queries)
   end
 
   return {}
@@ -69,7 +51,7 @@ local function attach_mappings(_, map)
       return
     end
     local jobs = require('dash.utils.jobs')
-    jobs.run_queries({ entry.query })
+    require('libdash_nvim').query({ cli_path, entry.query })
     jobs.open_item(entry.value)
     require('telescope.actions').close(buffnr)
   end)

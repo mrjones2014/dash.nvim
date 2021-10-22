@@ -12,8 +12,6 @@ endfunction
 command! -nargs=* -bang Dash :call <SID>dash_nvim_search(<bang>0, <q-args>)
 command! -nargs=0 -bang DashWord :call <SID>dash_nvim_search(<bang>0, expand('<cword>'))
 
-let g:dash_root_dir = expand('<sfile>:p:h:h')
-
 lua require('telescope._extensions.dash')
 lua require('telescope').load_extension('dash')
 
