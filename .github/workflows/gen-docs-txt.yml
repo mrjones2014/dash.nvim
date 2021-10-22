@@ -28,7 +28,6 @@ jobs:
             git add doc/dash.txt
             git commit -m "chore: generated vimdoc"
             git push --force https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} ${VIMDOC_BRANCH}
-            gh auth login --with-token
-            gh auth login
+            gh auth login --with-token ${GITHUB_TOKEN}
             gh pr create --fill --base ${GITHUB_REF#refs/heads/} --head ${VIMDOC_BRANCH} || true
           fi
