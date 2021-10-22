@@ -83,7 +83,7 @@ pub fn query_sync_lua_table<'a>(
 }
 
 #[mlua::lua_module]
-pub fn dash_runner(lua: &Lua) -> LuaResult<LuaTable> {
+pub fn dash_lib(lua: &Lua) -> LuaResult<LuaTable> {
     let exports = lua.create_table().unwrap();
     exports
         .set("query", lua.create_function(query_sync_lua_table).unwrap())
