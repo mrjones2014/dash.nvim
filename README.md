@@ -73,8 +73,8 @@ require('telescope').setup({
     dash = {
       -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
       dash_app_path = '/Applications/Dash.app',
-      -- debounce while typing, in milliseconds, defaults to 750 (0.75 seconds)
-      debounce = 500,
+      -- debounce while typing, in milliseconds
+      debounce = 0,
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype

@@ -3,8 +3,8 @@ local M = {}
 
 ---@class DashConfig
 M.config = {
-  dash_app_path = '/Applications/Dash.app',
-  debounce = 500,
+  dash_app_path = require('libdash_nvim').DASH_APP_BASE_PATH,
+  debounce = 0,
   file_type_keywords = {
     dashboard = false,
     NvimTree = false,
