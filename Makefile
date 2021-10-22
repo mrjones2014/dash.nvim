@@ -22,8 +22,7 @@ build-macos-x86:
 build-for-ci:
 	cargo build --release
 	@rm -rf ./lua/libdash_nvim.so ./lua/deps/
-	ls ./target/release/
-	@cp ./target/release/libdash_nvim.dylib ./lua/libdash_nvim.so
+	@cp ./target/release/libdash_nvim.so ./lua/libdash_nvim.so
 	@mkdir -p ./lua/deps/
 	@cp -r ./target/release/deps/*.rlib ./lua/deps/
 
