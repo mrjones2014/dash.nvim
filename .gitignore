@@ -1,4 +1,5 @@
 /target
 ./target/
+doc/tags
 /lua/*.so
 ./lua/*.so
