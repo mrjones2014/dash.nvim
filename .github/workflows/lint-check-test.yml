@@ -9,7 +9,7 @@ on:
 jobs:
   check-lua:
     name: Luacheck, Stylua, and Lua Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -41,14 +41,3 @@ jobs:
 
     - name: Run tests
       run: make test
-
-  check-rust:
-    name: Check Rust Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: |
-          make rust-ci
