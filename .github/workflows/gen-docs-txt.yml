@@ -1,4 +1,4 @@
-name: Autogenerate docs/dash.txt
+name: Autogenerate docs/dash-nvim.txt
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   gen-docs:
-    name: Autogenerate doc/dash.txt
+    name: Autogenerate doc/dash-nvim.txt
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,7 +30,7 @@ jobs:
       - name: Create PR
         run: |
           if ! [[ -z $(git status -s) ]]; then
-            git add doc/dash.txt
+            git add doc/dash-nvim.txt
             git commit -m "chore: generated vimdoc"
             git push --force https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} ${VIMDOC_BRANCH}
             gh pr create --fill --base ${GITHUB_REF#refs/heads/} --head ${VIMDOC_BRANCH} || true
