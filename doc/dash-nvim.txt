@@ -10,22 +10,10 @@ Table of Contents                                *dash-nvim-table-of-contents*
   - Rust Backend                                      |dash-nvim-rust-backend|
   - Contributing                                      |dash-nvim-contributing|
 
-<img
-src='https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg'
-title=''/> <img src='https://img.shields.io/badge/Made%20With-Lua-blue'
-title=''/> <https://www.lua.org> <img
-src='https://img.shields.io/badge/Made%20With-Rust-red' title=''/>
-<https://www.rust-lang.org>
-
 ==============================================================================
 1. Dash.nvim                                             *dash-nvim-dash.nvim*
 
 Query Dash.app <https://kapeli.com/dash> within Neovim with a Telescope picker!
-
-<div class="figure">
-<img src="./images/demo.gif" title="fig:"/>
-<p class="caption">demo</p>
-</div>
 
 The theme used in the recording is lighthaus.nvim
 <https://github.com/mrjones2014/lighthaus.nvim>.
@@ -33,8 +21,6 @@ The theme used in the recording is lighthaus.nvim
 Note: Dash is a Mac-only app, so you’ll only find this plugin useful on Mac.
 
 USAGE                                                        *dash-nvim-usage*
-
-Run `:h dash-nvim` to see these docs in Neovim.
 
 EDITOR COMMANDS ~
 
