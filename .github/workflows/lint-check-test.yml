@@ -43,7 +43,7 @@ jobs:
       run: make test
 
   check-rust:
-    name: Check Rust Binary Up to Date
+    name: Check Rust Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,4 +51,4 @@ jobs:
         with:
           toolchain: stable
       - run: |
-          make build-rust
+          make rust-ci

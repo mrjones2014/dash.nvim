@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-make build-rust
-git add bin/
+make build
+git add ./bin/
