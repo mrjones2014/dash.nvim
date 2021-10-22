@@ -1,7 +1,7 @@
 prepare:
 	@git submodule update --depth 1 --init
 
-test: build-for-ci
+test: build
 test: install
 test: prepare
 	@nvim --headless --noplugin -u spec/spec.vim -c "PlenaryBustedDirectory spec/ { minimal_init = 'spec/spec.vim' }"
@@ -18,16 +18,6 @@ build-macos-arm:
 
 build-macos-x86:
 	cargo build --release --target x86_64-apple-darwin
-
-build-for-ci:
-	cargo build --release
-	@rm -rf ./lua/libdash_nvim.so ./lua/deps/
-	@cp ./target/release/libdash_nvim.so ./lua/libdash_nvim.so
-	@mkdir -p ./lua/deps/
-	@cp -r ./target/release/deps/*.rlib ./lua/deps/
-
-install-linux:
-	echo test
 
 build: build-macos-arm
 build: build-macos-x86
