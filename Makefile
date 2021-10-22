@@ -16,8 +16,8 @@ build-rust:
 	cargo build --release --target aarch64-apple-darwin
 	mkdir -p ./bin/
 	rm ./bin/*.dylib
-	cp ./target/aarch64-apple-darwin/release/libdash_nvim.dylib ./bin/dash_lib_arm.dylib
-	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/dash_lib_x86.dylib
+	cp ./target/aarch64-apple-darwin/release/libdash_nvim.dylib ./target/aarch64-apple-darwin/release/libdash_nvim.so
+	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./target/x86_64-apple-darwin/release/libdash_nvim.so
 
 install:
 	./bin/install-for-architecture.sh
