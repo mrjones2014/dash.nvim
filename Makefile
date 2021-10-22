@@ -19,10 +19,8 @@ build:
 	mkdir -p ./bin/x86/deps/
 	cp ./target/aarch64-apple-darwin/release/libdash_nvim.dylib ./bin/arm/libdash_nvim.so
 	cp ./target/aarch64-apple-darwin/release/deps/*.rlib ./bin/arm/deps/
-	cp ./target/aarch64-apple-darwin/release/deps/*.rmeta ./bin/arm/deps/
 	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/x86/libdash_nvim.so
 	cp ./target/x86_64-apple-darwin/release/deps/*.rlib ./bin/x86/deps/
-	cp ./target/x86_64-apple-darwin/release/deps/*.rmeta ./bin/x86/deps/
 
 rust-ci:
 	cargo build --release
