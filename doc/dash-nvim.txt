@@ -1,4 +1,4 @@
-*dash-nvim.txt*Search Dash.app from Neovim with Telescope. Built with Lua and Rust.
+*dash-nvim.txt*                    Search Dash.app from Neovim with Telescope.
 
 ==============================================================================
 Table of Contents                                *dash-nvim-table-of-contents*
