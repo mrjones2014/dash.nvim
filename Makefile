@@ -1,6 +1,8 @@
 prepare:
 	@git submodule update --depth 1 --init
 
+test: build
+test: install
 test: prepare
 	@nvim --headless --noplugin -u spec/spec.vim -c "PlenaryBustedDirectory spec/ { minimal_init = 'spec/spec.vim' }"
 
