@@ -114,12 +114,12 @@ The Rust backend is exposed as a Lua module. To `require` the module, you will n
 on your runtimepath, as well as the `deps` directory, which must be in the same directory as the `libdash_nvim.so` shared library file.
 
 The Lua module exports one method, `query`, that takes a list of strings. The first item must be the path to the Dash.app CLI, e.g. `/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow`.
-
-Example:
+It also exports some string constants you can use to build the CLI path. See example below:
 
 ```lua
-local results = require('libdash_nvim').query({
-  '/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow',
+local libdash = require('libdash_nvim')
+local results = libdash.query({
+  libdash.DASH_APP_BASE_PATH .. libdash.DASH_APP_CLI_PATH,
   'javascript:array.prototype.filter',
   'typescript:array.prototype.filter',
 })
