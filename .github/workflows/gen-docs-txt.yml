@@ -8,6 +8,11 @@ jobs:
   gen-docs:
     name: Autogenerate doc/dash.txt
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup git
@@ -28,6 +33,5 @@ jobs:
             git add doc/dash.txt
             git commit -m "chore: generated vimdoc"
             git push --force https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} ${VIMDOC_BRANCH}
-            gh auth login
             gh pr create --fill --base ${GITHUB_REF#refs/heads/} --head ${VIMDOC_BRANCH} || true
           fi
