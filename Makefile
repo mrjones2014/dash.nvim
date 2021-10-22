@@ -11,7 +11,7 @@ watch: prepare
 clean:
 	@cargo clean
 
-build-rust:
+build:
 	cargo build --release --target x86_64-apple-darwin
 	cargo build --release --target aarch64-apple-darwin
 	rm -rf ./bin/
@@ -21,6 +21,10 @@ build-rust:
 	cp -r ./target/aarch64-apple-darwin/release/deps/ ./bin/arm/deps/
 	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/x86/libdash_nvim.so
 	cp -r ./target/x86_64-apple-darwin/release/deps/ ./bin/x86/deps/
+
+rust-ci:
+	cargo build --release
+
 
 install:
 	./scripts/install-for-architecture.bash
