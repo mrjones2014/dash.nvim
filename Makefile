@@ -14,13 +14,16 @@ clean:
 build-rust:
 	cargo build --release --target x86_64-apple-darwin
 	cargo build --release --target aarch64-apple-darwin
-	mkdir -p ./bin/
-	rm ./bin/*.dylib
-	cp ./target/aarch64-apple-darwin/release/libdash_nvim.dylib ./target/aarch64-apple-darwin/release/libdash_nvim.so
-	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./target/x86_64-apple-darwin/release/libdash_nvim.so
+	rm -rf ./bin/
+	mkdir -p ./bin/arm/deps/
+	mkdir -p ./bin/x86/deps/
+	cp ./target/aarch64-apple-darwin/release/libdash_nvim.dylib ./bin/arm/libdash_nvim.so
+	cp -r ./target/aarch64-apple-darwin/release/deps/ ./bin/arm/deps/
+	cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/x86/libdash_nvim.so
+	cp -r ./target/x86_64-apple-darwin/release/deps/ ./bin/x86/deps/
 
 install:
-	./bin/install-for-architecture.sh
+	./scripts/install-for-architecture.bash
 
 install-hooks:
 	@git config core.hooksPath .githooks
