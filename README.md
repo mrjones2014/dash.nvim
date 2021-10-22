@@ -1,5 +1,7 @@
 <!-- panvimdoc-ignore-start -->
+
 ![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org)
+
 <!-- panvimdoc-ignore-end -->
 
 # Dash.nvim
@@ -7,7 +9,9 @@
 Query [Dash.app](https://kapeli.com/dash) within Neovim with a Telescope picker!
 
 <!-- panvimdoc-ignore-start -->
+
 ![demo](./images/demo.gif)
+
 <!-- panvimdoc-ignore-end -->
 
 The theme used in the recording is [lighthaus.nvim](https://github.com/mrjones2014/lighthaus.nvim).
@@ -16,7 +20,11 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Usage
 
+<!-- panvimdoc-ignore-start -->
+
 Run `:h dash-nvim` to see these docs in Neovim.
+
+<!-- panvimdoc-ignore-end -->
 
 ### Editor Commands
 
