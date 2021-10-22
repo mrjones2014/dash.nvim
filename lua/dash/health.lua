@@ -2,7 +2,7 @@ local M = {}
 
 local function build_cli_path(dash_app_path)
   -- gsub to remove trailing slash, if there is one, because we're adding one
-  return (dash_app_path:gsub('(.)%/$', '%1')) .. require('dash.constants').dash_app_cli_path
+  return (dash_app_path:gsub('(.)%/$', '%1')) .. require('libdash_nvim').DASH_APP_CLI_PATH
 end
 
 function M.check()

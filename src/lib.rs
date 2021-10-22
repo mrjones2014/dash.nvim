@@ -1,4 +1,5 @@
 mod cli_runner;
+mod constants;
 use cli_runner::TelescopeItem;
 use crossbeam::channel;
 use futures::future::join_all;
@@ -77,6 +78,12 @@ pub fn libdash_nvim(lua: &Lua) -> LuaResult<LuaTable> {
     let exports = lua.create_table().unwrap();
     exports
         .set("query", lua.create_function(query_sync_lua_table).unwrap())
+        .unwrap();
+    exports
+        .set("DASH_APP_BASE_PATH", constants::DASH_APP_BASE_PATH)
+        .unwrap();
+    exports
+        .set("DASH_APP_CLI_PATH", constants::DASH_APP_CLI_PATH)
         .unwrap();
     return Ok(exports);
 }
