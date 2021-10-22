@@ -22,7 +22,7 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 <!-- panvimdoc-ignore-start -->
 
-Run `:h dash-nvim` to see these docs in Neovim.
+Run `:h dash` to see these docs in Neovim.
 
 <!-- panvimdoc-ignore-end -->
 
