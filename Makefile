@@ -39,9 +39,6 @@ build: build-macos-x86
 	@cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/x86/libdash_nvim.so
 	@cp ./target/x86_64-apple-darwin/release/deps/*.rlib ./bin/x86/deps/
 
-rust-ci:
-	cargo build --release
-
 install:
 	./scripts/install-for-architecture.bash
 
