@@ -1,4 +1,4 @@
-name: Autogenerate docs/dash-nvim.txt
+name: Autogenerate docs/dash.txt
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   gen-docs:
-    name: Autogenerate doc/dash-nvim.txt
+    name: Autogenerate doc/dash.txt
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,12 +25,12 @@ jobs:
       - name: panvimdoc
         uses: kdheepak/panvimdoc@v2.7.1
         with:
-          vimdoc: dash-nvim
+          vimdoc: dash
           description: Search Dash.app from Neovim with Telescope.
       - name: Create PR
         run: |
           if ! [[ -z $(git status -s) ]]; then
-            git add doc/dash-nvim.txt
+            git add doc/dash.txt
             git commit -m "chore: generated vimdoc"
             git push --force https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY} ${VIMDOC_BRANCH}
             gh pr create --fill --base ${GITHUB_REF#refs/heads/} --head ${VIMDOC_BRANCH} || true
