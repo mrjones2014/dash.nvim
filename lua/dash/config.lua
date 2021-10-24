@@ -61,7 +61,21 @@ M.config = {
   },
 }
 
-M.default_config = require('dash.utils.tables').deepcopy(M.config)
+local function deep_copy(tbl)
+  local result = {}
+
+  for k, v in pairs(tbl) do
+    if type(v) == 'table' then
+      result[k] = deep_copy(v)
+    else
+      result[k] = v
+    end
+  end
+
+  return result
+end
+
+M.default_config = deep_copy(M.config)
 
 --- Merge user config with default config
 ---@param new_config DashConfig
@@ -72,11 +86,10 @@ function M.setup(new_config)
 
   if new_config.file_type_keywords == false then
     M.config.file_type_keywords = {}
-  else
-    M.config.file_type_keywords = require('dash.utils.tables').merge_tables(
-      M.config.file_type_keywords,
-      new_config.file_type_keywords or {}
-    )
+  elseif new_config.file_type_keywords then
+    for key, value in pairs(new_config.file_type_keywords) do
+      M.config.file_type_keywords[key] = value
+    end
   end
 end
 

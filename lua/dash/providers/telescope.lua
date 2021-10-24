@@ -1,38 +1,6 @@
 local M = {}
 
-local cli_path = require('dash.utils.config').config.dash_app_path .. require('libdash_nvim').DASH_APP_CLI_PATH
-
-local function get_results_for_filetype(current_file_type, prompt, bang)
-  local config = require('dash.utils.config').config
-  local file_type_keywords = config.file_type_keywords[current_file_type]
-  if bang == true or not file_type_keywords then
-    return require('libdash_nvim').query({
-      cli_path,
-      prompt,
-    })
-  end
-
-  if file_type_keywords == true then
-    prompt = current_file_type .. ':' .. prompt
-    return require('libdash_nvim').query({
-      cli_path,
-      prompt,
-    })
-  end
-
-  if type(file_type_keywords) == 'table' then
-    local queries = {}
-    for _, value in ipairs(file_type_keywords) do
-      table.insert(queries, value .. ':' .. prompt)
-    end
-
-    table.insert(queries, 1, cli_path)
-
-    return require('libdash_nvim').query(queries)
-  end
-
-  return {}
-end
+local cli_path = require('dash.config').config.dash_app_path .. require('libdash_nvim').DASH_APP_CLI_PATH
 
 local function finder_fn(current_file_type, bang)
   return function(prompt)
@@ -40,7 +8,14 @@ local function finder_fn(current_file_type, bang)
       return {}
     end
 
-    return get_results_for_filetype(current_file_type, prompt, bang)
+    local queries = require('dash.query-builder').build_query(current_file_type, prompt, bang)
+
+    if #queries == 0 then
+      return {}
+    end
+
+    table.insert(queries, 1, cli_path)
+    return require('libdash_nvim').query(queries)
   end
 end
 
@@ -50,16 +25,16 @@ local function attach_mappings(_, map)
     if not entry then
       return
     end
-    local jobs = require('dash.utils.jobs')
-    require('libdash_nvim').query({ cli_path, entry.query })
-    jobs.open_item(entry.value)
+    local libdash = require('libdash_nvim')
+    libdash.query({ cli_path, entry.query })
+    libdash.open_item(entry.value)
     require('telescope.actions').close(buffnr)
   end)
   return true
 end
 
 local function build_picker_title()
-  local config = require('dash.utils.config').config
+  local config = require('dash.config').config
   local filetype = vim.bo.filetype
   local file_type_keywords = config.file_type_keywords[filetype]
   if not file_type_keywords then
@@ -101,7 +76,7 @@ function M.build_picker(bang, initial_text)
     prompt_title = build_picker_title(),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
-    debounce = require('dash.utils.config').config.debounce,
+    debounce = require('dash.config').config.debounce,
     attach_mappings = attach_mappings,
     default_text = initial_text,
   })
