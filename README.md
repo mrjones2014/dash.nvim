@@ -41,7 +41,7 @@ will search without this keyword filtering.
 The public API consists of two main functions.
 
 ```lua
--- See lua/dash/utils/config.lua for full DashConfig type definition
+-- See lua/dash.config.lua for full DashConfig type definition
 -- Also described in configuration section below
 ---@param config DashConfig
 require('dash').setup(config)
@@ -78,7 +78,7 @@ require('telescope').setup({
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
-      -- check lua/dash/utils/config.lua to see all defaults
+      -- check lua/dash.config.lua to see all defaults
       -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
       -- set file_type_keywords = false
