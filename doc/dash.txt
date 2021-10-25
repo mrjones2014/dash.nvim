@@ -4,8 +4,8 @@
 Table of Contents                                     *dash-table-of-contents*
 
 1. Dash.nvim                                                  |dash-dash.nvim|
-  - Usage                                                         |dash-usage|
   - Install                                                     |dash-install|
+  - Usage                                                         |dash-usage|
   - Configuration                                         |dash-configuration|
   - Backend                                                     |dash-backend|
   - Contributing                                           |dash-contributing|
@@ -16,6 +16,36 @@ Table of Contents                                     *dash-table-of-contents*
 Query Dash.app <https://kapeli.com/dash> within Neovim with a Telescope picker!
 
 Note: Dash is a Mac-only app, so you’ll only find this plugin useful on Mac.
+
+INSTALL                                                         *dash-install*
+
+After installing Dash.nvim, you must run `make install`. This can be done
+through a post-install hook with most plugin managers.
+
+Packer:
+
+>
+    use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
+<
+
+
+Paq:
+
+>
+    require("paq")({
+      'nvim-telescope/telescope.nvim';
+      {'mrjones2014/dash.nvim', run = 'make install'}
+    })
+<
+
+
+Vim-Plug:
+
+>
+    Plug 'nvim-telescope/telescope.nvim'
+    Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
+<
+
 
 USAGE                                                             *dash-usage*
 
@@ -31,36 +61,6 @@ will pre-fill the prompt with `[query]`.
 
 `:DashWord` will open the Telescope picker and pre-fill the prompt with the
 word under the cursor.
-
-LUA API ~
-
-The public API consists of two main functions.
-
->
-    -- See lua/dash.config.lua for full DashConfig type definition
-    -- Also described in configuration section below
-    ---@param config DashConfig
-    require('dash').setup(config)
-<
-
-
->
-    ---@param bang boolean @bang searches without any filtering
-    ---@param initial_text string @pre-fill text into the telescope picker
-    require('dash').search(bang, initial_text)
-<
-
-
-See |dash-backend| for documentation on the backend data provider.
-
-INSTALL                                                         *dash-install*
-
-Using Packer:
-
->
-    use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
-<
-
 
 CONFIGURATION                                             *dash-configuration*
 
@@ -104,6 +104,27 @@ are described below:
 
 If you notice an issue with the default `file_type_keywords` or would like a
 new filetype added, please file an issue or submit a PR!
+
+LUA API ~
+
+The public API consists of two main functions.
+
+>
+    -- See lua/dash.config.lua for full DashConfig type definition
+    -- Also described in configuration section below
+    ---@param config DashConfig
+    require('dash').setup(config)
+<
+
+
+>
+    ---@param bang boolean @bang searches without any filtering
+    ---@param initial_text string @pre-fill text into the telescope picker
+    require('dash').search(bang, initial_text)
+<
+
+
+See |dash-backend| for documentation on the backend data provider.
 
 BACKEND                                                         *dash-backend*
 
