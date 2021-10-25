@@ -18,6 +18,32 @@ The theme used in the recording is [lighthaus.nvim](https://github.com/mrjones20
 
 Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
+## Install
+
+After installing Dash.nvim, you must run `make install`. This can be done through a post-install hook with most plugin managers.
+
+Packer:
+
+```lua
+use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
+```
+
+Paq:
+
+```lua
+require("paq")({
+  'nvim-telescope/telescope.nvim';
+  {'mrjones2014/dash.nvim', run = 'make install'}
+})
+```
+
+Vim-Plug:
+
+```VimL
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
+```
+
 ## Usage
 
 <!-- panvimdoc-ignore-start -->
@@ -35,33 +61,6 @@ will search without this keyword filtering.
 `:Dash [query]` will open the Telescope picker, and if `[query]` is passed, it will pre-fill the prompt with `[query]`.
 
 `:DashWord` will open the Telescope picker and pre-fill the prompt with the word under the cursor.
-
-### Lua API
-
-The public API consists of two main functions.
-
-```lua
--- See lua/dash.config.lua for full DashConfig type definition
--- Also described in configuration section below
----@param config DashConfig
-require('dash').setup(config)
-```
-
-```lua
----@param bang boolean @bang searches without any filtering
----@param initial_text string @pre-fill text into the telescope picker
-require('dash').search(bang, initial_text)
-```
-
-See [backend](#Backend) for documentation on the backend data provider.
-
-## Install
-
-Using Packer:
-
-```lua
-use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
-```
 
 ## Configuration
 
@@ -102,6 +101,25 @@ require('telescope').setup({
 ```
 
 If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
+
+### Lua API
+
+The public API consists of two main functions.
+
+```lua
+-- See lua/dash.config.lua for full DashConfig type definition
+-- Also described in configuration section below
+---@param config DashConfig
+require('dash').setup(config)
+```
+
+```lua
+---@param bang boolean @bang searches without any filtering
+---@param initial_text string @pre-fill text into the telescope picker
+require('dash').search(bang, initial_text)
+```
+
+See [backend](#Backend) for documentation on the backend data provider.
 
 ## Backend
 
