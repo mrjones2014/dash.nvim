@@ -1,6 +1,7 @@
 mod cli_runner;
 mod constants;
 mod query_runner;
+mod sqlite_query_runner;
 
 use mlua::prelude::{Lua, LuaResult, LuaTable};
 use query_runner::{open_item, run_query_sync};
