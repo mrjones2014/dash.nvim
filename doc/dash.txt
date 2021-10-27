@@ -25,7 +25,12 @@ through a post-install hook with most plugin managers.
 Packer:
 
 >
-    use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
+    use({
+      'mrjones2014/dash.nvim',
+      requires = { 'nvim-telescope/telescope.nvim' },
+      run = 'make install',
+      disable = not vim.fn.has('macunix'),
+    })
 <
 
 
