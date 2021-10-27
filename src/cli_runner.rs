@@ -25,6 +25,10 @@ impl Clone for TelescopeItem {
     }
 }
 
+fn remove_rsquo_entities(input: &str) -> String {
+    return input.replace("&rsquo;", "'");
+}
+
 pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> {
     let raw_output = Command::new(cli_path)
         .args(&[query])
@@ -32,8 +36,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
         .expect("Failed to execute Dash.app CLI");
     let output_result: Result<String, FromUtf8Error> = String::from_utf8(raw_output.stdout);
     assert_eq!(output_result.is_ok(), true);
-    let output = output_result.unwrap();
-
+    let output = remove_rsquo_entities(&output_result.unwrap());
     let mut telescope_items = Vec::new();
 
     let xml_result = Document::parse(&output);
