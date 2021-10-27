@@ -25,7 +25,12 @@ After installing Dash.nvim, you must run `make install`. This can be done throug
 Packer:
 
 ```lua
-use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
+use({
+  'mrjones2014/dash.nvim',
+  requires = { 'nvim-telescope/telescope.nvim' },
+  run = 'make install',
+  disable = not vim.fn.has('macunix'),
+})
 ```
 
 Paq:
