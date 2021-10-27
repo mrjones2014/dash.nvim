@@ -1,6 +1,6 @@
 extern crate roxmltree;
 
-use regex::{NoExpand, Regex};
+use regex::Regex;
 use roxmltree::Document;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
@@ -25,22 +25,8 @@ impl Clone for TelescopeItem {
     }
 }
 
-fn remove_html_entities(subject: &str) -> String {
-    let mut decoded = Regex::new("&rsquo;")
-        .unwrap()
-        .replace_all(&subject, NoExpand("'"))
-        .to_string();
-
-    decoded = Regex::new("&quot;")
-        .unwrap()
-        .replace_all(&decoded, NoExpand("\\\""))
-        .to_string();
-
-    decoded = Regex::new("&apos;")
-        .unwrap()
-        .replace_all(&decoded, NoExpand("'"))
-        .to_string();
-    return decoded.to_string();
+fn remove_rsquo_entities(input: &str) -> String {
+    return input.replace("&rsquo;", "'");
 }
 
 pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> {
@@ -50,8 +36,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
         .expect("Failed to execute Dash.app CLI");
     let output_result: Result<String, FromUtf8Error> = String::from_utf8(raw_output.stdout);
     assert_eq!(output_result.is_ok(), true);
-    let output = remove_html_entities(&output_result.unwrap());
-
+    let output = remove_rsquo_entities(&output_result.unwrap());
     let mut telescope_items = Vec::new();
 
     let xml_result = Document::parse(&output);
