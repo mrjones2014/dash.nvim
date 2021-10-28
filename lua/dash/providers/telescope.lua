@@ -14,8 +14,7 @@ local function finder_fn(current_file_type, bang)
       return {}
     end
 
-    table.insert(queries, 1, cli_path)
-    return require('libdash_nvim').query(queries)
+    return require('libdash_nvim').query(cli_path, queries, require('dash.config').config.search_engine, prompt)
   end
 end
 
@@ -26,8 +25,13 @@ local function attach_mappings(_, map)
       return
     end
     local libdash = require('libdash_nvim')
-    libdash.query({ cli_path, entry.query })
-    libdash.open_item(entry.value)
+
+    if not entry.is_fallback then
+      libdash.query(cli_path, { entry.query })
+      libdash.open_item(entry.value)
+    else
+      libdash.open_search_engine(entry.value)
+    end
     require('telescope.actions').close(buffnr)
   end)
   return true
