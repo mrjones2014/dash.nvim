@@ -5,6 +5,8 @@ use roxmltree::Document;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
+use crate::constants::KEYWORD_PATTERN;
+
 pub struct TelescopeItem {
     pub value: String,
     pub ordinal: String,
@@ -29,7 +31,7 @@ fn remove_rsquo_entities(input: &str) -> String {
     return input.replace("&rsquo;", "'");
 }
 
-pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> {
+pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
     let raw_output = Command::new(cli_path)
         .args(&[query])
         .output()
@@ -48,7 +50,7 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
 
     let items_element = doc.descendants().find(|n| n.tag_name().name() == "items");
 
-    let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
+    let keyword_pattern = Regex::new(KEYWORD_PATTERN).unwrap();
 
     items_element.unwrap().children().for_each(|item| {
         let relevant_tags = item.children().filter(|child| {

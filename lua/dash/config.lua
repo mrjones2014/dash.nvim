@@ -4,6 +4,7 @@ local M = {}
 ---@class DashConfig
 M.config = {
   dash_app_path = require('libdash_nvim').DASH_APP_BASE_PATH,
+  search_engine = 'ddg',
   debounce = 0,
   file_type_keywords = {
     dashboard = false,
@@ -81,8 +82,9 @@ M.default_config = deep_copy(M.config)
 ---@param new_config DashConfig
 function M.setup(new_config)
   new_config = new_config or {}
-  M.config.dash_app_path = new_config.dash_app_path or M.config.dash_app_path
-  M.config.debounce = new_config.debounce or M.config.debounce
+  M.config.dash_app_path = new_config.dash_app_path or M.default_config.dash_app_path
+  M.config.debounce = new_config.debounce or M.default_config.debounce
+  M.config.search_engine = new_config.search_engine or M.default_config.search_engine
 
   if new_config.file_type_keywords == false then
     M.config.file_type_keywords = {}
