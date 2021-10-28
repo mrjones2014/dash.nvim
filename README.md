@@ -138,16 +138,27 @@ binary into the `lua/` directory so that it is added to Lua's runtimepath.
 The Rust backend is exposed as a Lua module. To `require` the module, you will need to have the file `libdash_nvim.so` for your architecture (M1 or Intel)
 on your runtimepath, as well as the `deps` directory, which must be in the same directory as the `libdash_nvim.so` shared library file.
 
-The Lua module exports one method, `query`, that takes a list of strings. The first item must be the path to the Dash.app CLI, e.g. `/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow`.
-It also exports some string constants you can use to build the CLI path. See example below:
+### Constants
+
+The Rust backend exports the following constants for use:
+
+- `require('libdash_nvim').DASH_APP_BASE_PATH` => "/Applications/Dash.app"
+- `require('libdash_nvim).DASH_APP_CLI_PATH` => "/Contents/Resources/dashAlfredWorkflow"
+
+### `libdash_nvim.query`
+
+This method (`require('libdash_nivm').query`) takes 4 arguments: the Dash CLI path, the list of queries, the search engine fallback to use,
+and the literal typed text to input to the search engine fallback.
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query({
+local results = libdash.query(
   libdash.DASH_APP_BASE_PATH .. libdash.DASH_APP_CLI_PATH,
   'javascript:array.prototype.filter',
   'typescript:array.prototype.filter',
-})
+  'duckduckgo',
+  'array.prototype.filter'
+)
 ```
 
 The `query` method returns a table with the following properties:
@@ -158,9 +169,37 @@ The `query` method returns a table with the following properties:
 - `keyword` -- the keyword (if there was one) on the query that returned this result
 - `query` -- the full query that returned this result
 
+If no items are returned from querying Dash, it will return a single item with an extra key, `fallback = true`. The table will look something like the following:
+
+```lua
+{
+  value = 'https://duckduckgo.com/?q=array.prototype.filter',
+  ordinal = '1',
+  display = 'Search with DuckDuckGo: array.prototype.filter',
+  is_fallback = true,
+}
+```
+
+
+### `libdash_nvim.open_item`
+
+Takes the `value` property of an item returned from querying Dash and opens it in Dash.
+
+```lua
+require('libdash_nvim').open_item(1)
+```
+
 **Note:** if running multiple queries, simply opening `dash-workflow-callback://[value]` may not work directly. Opening the URL assumes that
-the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the CLI again with
-only the `query` value from the selected item, then opening `dash-workflow-callback://[value]`.
+the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the query again with
+only the `query` value from the selected item, then calling `require('libdash_nvim).open` with that item's `value`.
+
+### `libdash_nvim.open_search_engine`
+
+Utility method to open a search engine URL when the fallback item is selected.
+
+```lua
+require('libdash_nvim').open_search_engine('https://duckduckgo.com/?q=array.prototype.filter')
+```
 
 ---
 
