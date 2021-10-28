@@ -77,6 +77,8 @@ require('telescope').setup({
     dash = {
       -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
       dash_app_path = '/Applications/Dash.app',
+      -- search engine to fall back to when Dash has no results, must be one of: 'ddg', 'duckduckgo', 'startpage', 'google'
+      search_engine = 'ddg',
       -- debounce while typing, in milliseconds
       debounce = 0,
       -- map filetype strings to the keywords you've configured for docsets in Dash
