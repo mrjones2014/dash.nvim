@@ -6,15 +6,6 @@ local function finder_fn(current_file_type, bang)
       return {}
     end
 
-    --     local queries = require('dash.query-builder').build_query(current_file_type, prompt, bang)
-
-    --     if #queries == 0 then
-    --       return {}
-    --     end
-
-    print(prompt)
-    print(current_file_type)
-    print(bang)
     return require('libdash_nvim').query(prompt, current_file_type, bang)
   end
 end
