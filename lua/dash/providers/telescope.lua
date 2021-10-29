@@ -17,7 +17,7 @@ local function finder_fn(current_file_type, bang)
     print(prompt)
     print(current_file_type)
     print(bang)
-    return require('libdash_nvim').query(prompt, current_file_type, bang, require('dash.config').config)
+    return require('libdash_nvim').query(prompt, current_file_type, bang)
   end
 end
 
@@ -30,7 +30,7 @@ local function attach_mappings(_, map)
     local libdash = require('libdash_nvim')
 
     if not entry.is_fallback then
-      libdash.query(entry.value, '', true, require('dash.config').config)
+      libdash.query(entry.value, '', true)
       libdash.open_item(entry.value)
     else
       libdash.open_search_engine(entry.value)
