@@ -19,7 +19,7 @@ local function attach_mappings(_, map)
     local libdash = require('libdash_nvim')
 
     if not entry.is_fallback then
-      libdash.query(entry.value, '', true)
+      libdash.query(entry.query, '', true)
       libdash.open_item(entry.value)
     else
       libdash.open_search_engine(entry.value)
