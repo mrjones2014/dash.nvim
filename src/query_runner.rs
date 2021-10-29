@@ -172,9 +172,7 @@ pub fn query<'a>(
     let cli_path: String = format!("{}{}", dash_app_base_path, DASH_APP_CLI_PATH);
     let search_engine_string: String = config.get("search_engine").unwrap_or("ddg".to_string());
     let search_engine = SearchEngine::from_str(&search_engine_string).unwrap();
-    let file_type_keywords = config
-        .get("file_type_keywords")
-        .unwrap_or(lua.create_table().unwrap());
+    let file_type_keywords: LuaTable = config.get("file_type_keywords").unwrap();
 
     return run_query_sync(
         lua,
