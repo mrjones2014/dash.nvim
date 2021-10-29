@@ -185,7 +185,7 @@ The `query` method returns a table with the following properties:
 
 
 If no items are returned from querying Dash, it will return a single item with
-an extra key, `fallback = true`. The table will look something like the
+an extra key, `is_fallback = true`. The table will look something like the
 following:
 
 >
