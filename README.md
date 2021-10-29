@@ -1,6 +1,6 @@
 <!-- panvimdoc-ignore-start -->
 
-![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org)
+![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org)
 
 <!-- panvimdoc-ignore-end -->
 
