@@ -1,5 +1,6 @@
 mod cli_runner;
 mod constants;
+mod query_builder;
 mod query_runner;
 mod search_engine_fallback;
 

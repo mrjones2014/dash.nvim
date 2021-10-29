@@ -6,6 +6,7 @@ use crate::cli_runner::run_query;
 use crate::cli_runner::TelescopeItem;
 use crate::constants::DASH_APP_BASE_PATH;
 use crate::constants::DASH_APP_CLI_PATH;
+use crate::query_builder::build_query;
 use crate::search_engine_fallback::get_search_engine_url;
 use crate::search_engine_fallback::SearchEngine;
 use crossbeam::channel;
@@ -116,56 +117,18 @@ fn run_query_sync<'a>(
     return Ok(lua_result_list.to_owned());
 }
 
-fn build_query(
-    lua: &Lua,
-    search_text: &str,
-    buffer_type: &str,
-    bang: bool,
-    file_type_keywords_table: LuaTable,
-) -> Vec<String> {
-    let mut queries = Vec::new();
-    if bang {
-        queries.push(search_text.to_string());
-        return queries;
-    }
-
-    let file_type_keywords: LuaValue =
-        if file_type_keywords_table.contains_key(buffer_type).unwrap() {
-            file_type_keywords_table.get(buffer_type).unwrap()
-        } else {
-            mlua::Value::Boolean(false)
-        };
-
-    if file_type_keywords.type_name() == "boolean" {
-        if file_type_keywords.eq(&mlua::Value::Boolean(true)) {
-            queries.push(format!("{}:{}", buffer_type, search_text));
-            return queries;
-        }
-
-        // otherwise it's false, and filtering by the buffer type is disabled
-        queries.push(search_text.to_string());
-        return queries;
-    }
-
-    if file_type_keywords.type_name() == "table" {
-        let keywords_table: LuaTable = LuaTable::from_lua(file_type_keywords, lua).unwrap();
-        for pair in keywords_table.pairs::<Option<String>, String>().into_iter() {
-            queries.push(format!("{}:{}", pair.unwrap().1, search_text));
-        }
-
-        return queries;
-    }
-
-    // if all else fails, just return the search_text as the only query
-    queries.push(search_text.to_string());
-    return queries;
+fn get_config(lua: &Lua) -> LuaTable {
+    let require: LuaFunction = lua.globals().get("require").unwrap();
+    let config_module: LuaTable = require.call("dash.config").unwrap();
+    return config_module.get("config").unwrap();
 }
 
 pub fn query<'a>(
     lua: &'a Lua,
-    (search_text, current_buffer_type, bang, config): (String, String, bool, LuaTable),
+    (search_text, current_buffer_type, bang): (String, String, bool),
 ) -> Result<LuaTable<'a>, LuaError> {
     // compute query params from config
+    let config = get_config(lua);
     let dash_app_base_path: String = config
         .get("dash_app_path")
         .unwrap_or(DASH_APP_BASE_PATH.to_string());
