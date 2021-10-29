@@ -147,17 +147,16 @@ The Rust backend exports the following constants for use:
 
 ### `libdash_nvim.query`
 
-This method (`require('libdash_nivm').query`) takes 4 arguments: the Dash CLI path, the list of queries, the search engine fallback to use,
-and the literal typed text to input to the search engine fallback.
+This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
+and a boolean indicatign whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
+The implementation internally calls `require('dash.config')` to get the configuration table.
 
 ```lua
 local libdash = require('libdash_nvim')
 local results = libdash.query(
-  libdash.DASH_APP_BASE_PATH .. libdash.DASH_APP_CLI_PATH,
-  'javascript:array.prototype.filter',
-  'typescript:array.prototype.filter',
-  'duckduckgo',
-  'array.prototype.filter'
+  'match arms',
+  'rust',
+  false
 )
 ```
 
