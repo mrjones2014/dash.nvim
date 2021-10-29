@@ -38,7 +38,7 @@ Paq:
 ```lua
 require("paq")({
   'nvim-telescope/telescope.nvim';
-  {'mrjones2014/dash.nvim', run = 'make install'}
+  {'mrjones2014/dash.nvim', run = 'make install'};
 })
 ```
 
