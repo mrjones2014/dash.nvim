@@ -1,7 +1,5 @@
 local M = {}
 
-local cli_path = require('dash.config').config.dash_app_path .. require('libdash_nvim').DASH_APP_CLI_PATH
-
 local function finder_fn(current_file_type, bang)
   return function(prompt)
     if not prompt or #prompt == 0 then
