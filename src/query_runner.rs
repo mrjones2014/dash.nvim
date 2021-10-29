@@ -143,11 +143,14 @@ pub fn query<'a>(
             cli_path,
             build_query(
                 lua,
-                &search_text,
-                &current_buffer_type,
-                bang,
-                file_type_keywords,
-            ),
+                (
+                    search_text.to_string(),
+                    current_buffer_type,
+                    bang,
+                    file_type_keywords,
+                ),
+            )
+            .unwrap(),
             search_engine,
             search_text,
         ),

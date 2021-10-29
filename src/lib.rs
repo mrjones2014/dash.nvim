@@ -5,6 +5,7 @@ mod query_runner;
 mod search_engine_fallback;
 
 use mlua::prelude::{Lua, LuaResult, LuaTable};
+use query_builder::build_query;
 use query_runner::{open_item, open_search_engine, query};
 
 #[mlua::lua_module]
@@ -21,6 +22,9 @@ pub fn libdash_nvim(lua: &Lua) -> LuaResult<LuaTable> {
             "open_search_engine",
             lua.create_function(open_search_engine).unwrap(),
         )
+        .unwrap();
+    exports
+        .set("build_query", lua.create_function(build_query).unwrap())
         .unwrap();
     exports
         .set("DASH_APP_BASE_PATH", constants::DASH_APP_BASE_PATH)
