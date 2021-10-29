@@ -4,6 +4,8 @@ use std::str::FromStr;
 
 use crate::cli_runner::run_query;
 use crate::cli_runner::TelescopeItem;
+use crate::constants::DASH_APP_BASE_PATH;
+use crate::constants::DASH_APP_CLI_PATH;
 use crate::search_engine_fallback::get_search_engine_url;
 use crate::search_engine_fallback::SearchEngine;
 use crossbeam::channel;
@@ -11,7 +13,7 @@ use futures::future::join_all;
 use mlua::prelude::*;
 use tokio::runtime::Runtime;
 
-async fn query<'a>(cli_path: &'a str, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
+async fn query_async<'a>(cli_path: &'a str, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
     let mut results: Vec<TelescopeItem> = Vec::new();
     let mut futures = Vec::new();
     for i in 0..queries.len() {
@@ -35,7 +37,7 @@ fn query_sync(cli_path: String, queries: Vec<String>) -> Vec<TelescopeItem> {
     let runtime = Runtime::new().unwrap();
     let handle = runtime.handle();
     handle.spawn(async move {
-        let result_table = &query(&cli_path, &queries).await;
+        let result_table = &query_async(&cli_path, &queries).await;
         let _ = tx.send(result_table.clone());
     });
     return rx.recv().unwrap().to_owned().to_vec();
@@ -49,13 +51,13 @@ fn search_engine_human_name(search_engine: &SearchEngine) -> String {
     };
 }
 
-pub fn run_query_sync<'a>(
+fn run_query_sync<'a>(
     lua: &'a Lua,
     (cli_path, queries, search_engine_fallback, search_text): (
         String,
         Vec<String>,
-        Option<String>,
-        Option<String>,
+        SearchEngine,
+        String,
     ),
 ) -> Result<LuaTable<'a>, LuaError> {
     let result_telescope_items = query_sync(cli_path.to_string(), queries);
@@ -86,17 +88,12 @@ pub fn run_query_sync<'a>(
         i = i + 1;
     }
 
-    if result_telescope_items.len() == 0
-        && search_engine_fallback.is_some()
-        && search_text.is_some()
-    {
-        let search_text_value = search_text.unwrap();
-        let search_engine_value = SearchEngine::from_str(&search_engine_fallback.unwrap()).unwrap();
+    if result_telescope_items.len() == 0 {
         let search_engine_item_table = lua.create_table().unwrap();
         search_engine_item_table
             .set(
                 "value",
-                get_search_engine_url(&search_engine_value, &search_text_value),
+                get_search_engine_url(&search_engine_fallback, &search_text),
             )
             .unwrap();
         search_engine_item_table.set("ordinal", "1").unwrap();
@@ -105,8 +102,8 @@ pub fn run_query_sync<'a>(
                 "display",
                 format!(
                     "Search with {}: {}",
-                    search_engine_human_name(&search_engine_value),
-                    search_text_value
+                    search_engine_human_name(&search_engine_fallback),
+                    search_text
                 ),
             )
             .unwrap();
@@ -117,6 +114,83 @@ pub fn run_query_sync<'a>(
     }
 
     return Ok(lua_result_list.to_owned());
+}
+
+fn build_query(
+    lua: &Lua,
+    search_text: &str,
+    buffer_type: &str,
+    bang: bool,
+    file_type_keywords_table: LuaTable,
+) -> Vec<String> {
+    let mut queries = Vec::new();
+    if bang {
+        queries.push(search_text.to_string());
+        return queries;
+    }
+
+    let file_type_keywords: LuaValue =
+        if file_type_keywords_table.contains_key(buffer_type).unwrap() {
+            file_type_keywords_table.get(buffer_type).unwrap()
+        } else {
+            mlua::Value::Boolean(false)
+        };
+
+    if file_type_keywords.type_name() == "boolean" {
+        if file_type_keywords.eq(&mlua::Value::Boolean(true)) {
+            queries.push(format!("{}:{}", buffer_type, search_text));
+            return queries;
+        }
+
+        // otherwise it's false, and filtering by the buffer type is disabled
+        queries.push(search_text.to_string());
+        return queries;
+    }
+
+    if file_type_keywords.type_name() == "table" {
+        let keywords_table: LuaTable = LuaTable::from_lua(file_type_keywords, lua).unwrap();
+        for pair in keywords_table.pairs::<Option<String>, String>().into_iter() {
+            queries.push(format!("{}:{}", pair.unwrap().1, search_text));
+        }
+
+        return queries;
+    }
+
+    // if all else fails, just return the search_text as the only query
+    queries.push(search_text.to_string());
+    return queries;
+}
+
+pub fn query<'a>(
+    lua: &'a Lua,
+    (search_text, current_buffer_type, bang, config): (String, String, bool, LuaTable),
+) -> Result<LuaTable<'a>, LuaError> {
+    // compute query params from config
+    let dash_app_base_path: String = config
+        .get("dash_app_path")
+        .unwrap_or(DASH_APP_BASE_PATH.to_string());
+    let cli_path: String = format!("{}{}", dash_app_base_path, DASH_APP_CLI_PATH);
+    let search_engine_string: String = config.get("search_engine").unwrap_or("ddg".to_string());
+    let search_engine = SearchEngine::from_str(&search_engine_string).unwrap();
+    let file_type_keywords = config
+        .get("file_type_keywords")
+        .unwrap_or(lua.create_table().unwrap());
+
+    return run_query_sync(
+        lua,
+        (
+            cli_path,
+            build_query(
+                lua,
+                &search_text,
+                &current_buffer_type,
+                bang,
+                file_type_keywords,
+            ),
+            search_engine,
+            search_text,
+        ),
+    );
 }
 
 pub fn open_item(_: &Lua, item_num: c_double) -> Result<bool, LuaError> {
