@@ -147,16 +147,16 @@ The Rust backend exports the following constants for use:
 
 ### `libdash_nvim.query`
 
-This method (`require('libdash_nivm').query`) takes 4 arguments: the search text, the current buffer type,
-whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`), and the configuration table.
+This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
+and a boolean indicatign whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
+The implementation internally calls `require('dash.config')` to get the configuration table.
 
 ```lua
 local libdash = require('libdash_nvim')
 local results = libdash.query(
   'match arms',
   'rust',
-  false,
-  require('dash.config').config
+  false
 )
 ```
 
