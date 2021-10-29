@@ -168,7 +168,7 @@ The `query` method returns a table with the following properties:
 - `keyword` -- the keyword (if there was one) on the query that returned this result
 - `query` -- the full query that returned this result
 
-If no items are returned from querying Dash, it will return a single item with an extra key, `fallback = true`. The table will look something like the following:
+If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`. The table will look something like the following:
 
 ```lua
 {
