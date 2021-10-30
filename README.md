@@ -84,7 +84,7 @@ require('telescope').setup({
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
-      -- check lua/dash.config.lua to see all defaults
+      -- check src/config.rs to see all defaults
       -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
       -- set file_type_keywords = false
@@ -114,9 +114,9 @@ If you notice an issue with the default `file_type_keywords` or would like a new
 The public API consists of two main functions.
 
 ```lua
--- See lua/dash.config.lua for full DashConfig type definition
+-- See src/config.rs for available config keys
 -- Also described in configuration section below
----@param config DashConfig
+---@param config
 require('dash').setup(config)
 ```
 
@@ -149,7 +149,6 @@ The Rust backend exports the following constants for use:
 
 This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
 and a boolean indicatign whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
-The implementation internally calls `require('dash.config')` to get the configuration table.
 
 ```lua
 local libdash = require('libdash_nvim')

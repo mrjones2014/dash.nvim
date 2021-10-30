@@ -1,4 +1,5 @@
 use mlua::prelude::*;
+use mlua::FromLua;
 
 pub fn build_query(
     lua: &Lua,
@@ -29,6 +30,18 @@ pub fn build_query(
 
         // otherwise it's false, and filtering by the buffer type is disabled
         queries.push(search_text.to_string());
+        return Ok(queries);
+    }
+
+    if file_type_keywords.type_name() == "string" {
+        queries.push(format!(
+            "{}:{}",
+            LuaString::from_lua(file_type_keywords, lua)
+                .unwrap()
+                .to_str()
+                .unwrap(),
+            search_text
+        ));
         return Ok(queries);
     }
 
