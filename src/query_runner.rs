@@ -4,6 +4,7 @@ use std::str::FromStr;
 
 use crate::cli_runner::run_query;
 use crate::cli_runner::TelescopeItem;
+use crate::config::get_config_table;
 use crate::constants::DASH_APP_BASE_PATH;
 use crate::constants::DASH_APP_CLI_PATH;
 use crate::query_builder::build_query;
@@ -117,18 +118,12 @@ fn run_query_sync<'a>(
     return Ok(lua_result_list.to_owned());
 }
 
-fn get_config(lua: &Lua) -> LuaTable {
-    let require: LuaFunction = lua.globals().get("require").unwrap();
-    let config_module: LuaTable = require.call("dash.config").unwrap();
-    return config_module.get("config").unwrap();
-}
-
 pub fn query<'a>(
     lua: &'a Lua,
     (search_text, current_buffer_type, bang): (String, String, bool),
 ) -> Result<LuaTable<'a>, LuaError> {
     // compute query params from config
-    let config = get_config(lua);
+    let config = get_config_table(lua);
     let dash_app_base_path: String = config
         .get("dash_app_path")
         .unwrap_or(DASH_APP_BASE_PATH.to_string());
