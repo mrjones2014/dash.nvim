@@ -147,8 +147,17 @@ The Rust backend exports the following constants for use:
 
 ### `libdash_nvim.config` (table)
 
-The Rust backend also exports a table item, `config`. You can access it via `require('libdash_nvim').config`.
+This table stores the internal configuration. You can access it via `require('libdash_nvim').config`.
 See `src/config.rs` or [configuration](#configuration) above for configuration keys.
+
+### `libdash_nvim.default_config` (table)
+
+This table stores the *default* configuration. **You should not modify this table, treat it as read-only.** This is mainly
+to help with merging your custom config with the default config, but can be useful for debugging purposes. For example:
+
+```VimL
+:lua print(vim.inspect(require('libdash_nvim').default_config))
+```
 
 ### `libdash_nvim.setup` (function)
 
