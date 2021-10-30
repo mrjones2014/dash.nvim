@@ -100,7 +100,7 @@ require('telescope').setup({
         typescriptreact = { 'typescript', 'javascript', 'react' },
         javascriptreact = { 'javascript', 'react' },
         -- you can also do a string, for example,
-        -- bash = 'sh'
+        -- sh = 'bash'
       },
     }
   }

@@ -105,6 +105,22 @@ describe("require('libdash_nvim')", function()
     )
 
     it(
+      'when bang=false and file_type_keywords value is a string, then should return single query'
+        .. 'prefixed with given string',
+      function()
+        local search_text = 'match arms'
+        local buffer_type = 'rust'
+        local bang = false
+        local file_type_keywords = { rust = 'test' }
+
+        local results = require('libdash_nvim').build_query(search_text, buffer_type, bang, file_type_keywords)
+
+        assert.are.equal(1, #results)
+        assert.are.equal('test:' .. search_text, results[1])
+      end
+    )
+
+    it(
       'when bang=false and file_type_keywords value is an invalid value, then assume no file type filtering',
       function()
         local search_text = 'match arms'
