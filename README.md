@@ -84,7 +84,7 @@ require('telescope').setup({
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
-      -- check lua/dash.config.lua to see all defaults
+      -- check src/config.rs to see all defaults
       -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
       -- set file_type_keywords = false
@@ -114,9 +114,9 @@ If you notice an issue with the default `file_type_keywords` or would like a new
 The public API consists of two main functions.
 
 ```lua
--- See lua/dash.config.lua for full DashConfig type definition
+-- See src/config.rs for available config keys
 -- Also described in configuration section below
----@param config DashConfig
+---@param config
 require('dash').setup(config)
 ```
 
@@ -145,11 +145,36 @@ The Rust backend exports the following constants for use:
 - `require('libdash_nvim').DASH_APP_BASE_PATH` => "/Applications/Dash.app"
 - `require('libdash_nvim).DASH_APP_CLI_PATH` => "/Contents/Resources/dashAlfredWorkflow"
 
-### `libdash_nvim.query`
+### `libdash_nvim.config` (table)
+
+This table stores the internal configuration. You can access it via `require('libdash_nvim').config`.
+See `src/config.rs` or [configuration](#configuration) above for configuration keys.
+
+### `libdash_nvim.default_config` (table)
+
+This table stores the *default* configuration. **You should not modify this table, treat it as read-only.** This is mainly
+to help with merging your custom config with the default config, but can be useful for debugging purposes. For example:
+
+```VimL
+:lua print(vim.inspect(require('libdash_nvim').default_config))
+```
+
+### `libdash_nvim.setup` (function)
+
+This method is used to set the internal configuration of the backend. It takes a table, which will be
+**merged with the default configuration**. See `src/config.rs` or [configuration](#configuration) above
+for configuration keys.
+
+```lua
+require('libdash_nvim').setup({
+  -- your custom configuration here
+})
+```
+
+### `libdash_nvim.query` (function)
 
 This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
 and a boolean indicatign whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
-The implementation internally calls `require('dash.config')` to get the configuration table.
 
 ```lua
 local libdash = require('libdash_nvim')
@@ -180,7 +205,7 @@ If no items are returned from querying Dash, it will return a single item with a
 ```
 
 
-### `libdash_nvim.open_item`
+### `libdash_nvim.open_item` (function)
 
 Takes the `value` property of an item returned from querying Dash and opens it in Dash.
 
@@ -192,7 +217,7 @@ require('libdash_nvim').open_item(1)
 the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the query again with
 only the `query` value from the selected item, then calling `require('libdash_nvim).open` with that item's `value`.
 
-### `libdash_nvim.open_search_engine`
+### `libdash_nvim.open_search_engine` (function)
 
 Utility method to open a search engine URL when the fallback item is selected.
 

@@ -37,7 +37,11 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
         .output()
         .expect("Failed to execute Dash.app CLI");
     let output_result: Result<String, FromUtf8Error> = String::from_utf8(raw_output.stdout);
-    assert_eq!(output_result.is_ok(), true);
+
+    if !output_result.is_ok() {
+        return Vec::new();
+    }
+
     let output = remove_rsquo_entities(&output_result.unwrap());
     let mut telescope_items = Vec::new();
 
@@ -52,7 +56,7 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
 
     let keyword_pattern = Regex::new(KEYWORD_PATTERN).unwrap();
 
-    items_element.unwrap().children().for_each(|item| {
+    for item in items_element.unwrap().children() {
         let relevant_tags = item.children().filter(|child| {
             let tag_name = child.tag_name().name();
             return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
@@ -66,9 +70,9 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
             _ => {}
         });
 
-        assert_ne!(item_value, "");
-        assert_ne!(title, "");
-        assert_ne!(subtitle, "");
+        if item_value == "" || title == "" || subtitle == "" {
+            continue;
+        }
 
         title = format!("{}: {}", title, subtitle);
 
@@ -88,6 +92,6 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
             keyword: keyword.to_string(),
             query: query.to_string(),
         });
-    });
+    }
     return telescope_items;
 }
