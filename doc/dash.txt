@@ -190,7 +190,7 @@ a table, which will be **merged with the default configuration**. See
 `LIBDASH_NVIM.QUERY` (FUNCTION) ~
 
 This method (`require('libdash_nivm').query`) takes 3 arguments: the search
-text, the current buffer type, and a boolean indicatign whether to disable
+text, the current buffer type, and a boolean indicating whether to disable
 filetype filtering (e.g. command was run with bang, `:Dash!`).
 
 >
