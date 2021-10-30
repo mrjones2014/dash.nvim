@@ -174,7 +174,7 @@ require('libdash_nvim').setup({
 ### `libdash_nvim.query` (function)
 
 This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
-and a boolean indicatign whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
+and a boolean indicating whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
 
 ```lua
 local libdash = require('libdash_nvim')
