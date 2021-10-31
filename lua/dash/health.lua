@@ -41,7 +41,7 @@ function M.check()
   require('telescope').load_extension('dash')
 
   health_start('Configuration')
-  local config = require('dash.config').config
+  local config = require('libdash_nvim').config
   local dash_app_path = config.dash_app_path
   local cli_path = build_cli_path(dash_app_path)
   -- check if Dash.app CLI is executable at configured path
@@ -51,7 +51,7 @@ function M.check()
     health_error('Dash.app not found at configured path: ' .. dash_app_path)
 
     -- if not executable at configured path, check if executable at default path
-    local default_path = require('dash.config').default_config.dash_app_path
+    local default_path = require('libdash_nvim').default_config.dash_app_path
     if vim.fn.executable(build_cli_path(default_path)) == 0 then
       health_info('Dash.app found and executable at default path: ' .. default_path)
     end

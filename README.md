@@ -1,6 +1,6 @@
 <!-- panvimdoc-ignore-start -->
 
-![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org)
+![Build](https://github.com/mrjones2014/dash.nvim/actions/workflows/lint-check-test.yml/badge.svg) [![Rust](https://img.shields.io/badge/Made%20With-Rust-red)](https://www.rust-lang.org) [![Lua](https://img.shields.io/badge/Made%20With-Lua-blue)](https://www.lua.org)
 
 <!-- panvimdoc-ignore-end -->
 
@@ -25,7 +25,12 @@ After installing Dash.nvim, you must run `make install`. This can be done throug
 Packer:
 
 ```lua
-use({ 'mrjones2014/dash.nvim', requires = { 'nvim-telescope/telescope.nvim' }, run = 'make install' })
+use({
+  'mrjones2014/dash.nvim',
+  requires = { 'nvim-telescope/telescope.nvim' },
+  run = 'make install',
+  disable = not vim.fn.has('macunix'),
+})
 ```
 
 Paq:
@@ -33,7 +38,7 @@ Paq:
 ```lua
 require("paq")({
   'nvim-telescope/telescope.nvim';
-  {'mrjones2014/dash.nvim', run = 'make install'}
+  {'mrjones2014/dash.nvim', run = 'make install'};
 })
 ```
 
@@ -72,12 +77,14 @@ require('telescope').setup({
     dash = {
       -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
       dash_app_path = '/Applications/Dash.app',
+      -- search engine to fall back to when Dash has no results, must be one of: 'ddg', 'duckduckgo', 'startpage', 'google'
+      search_engine = 'ddg',
       -- debounce while typing, in milliseconds
       debounce = 0,
       -- map filetype strings to the keywords you've configured for docsets in Dash
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
-      -- check lua/dash.config.lua to see all defaults
+      -- check src/config.rs to see all defaults
       -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
       -- set file_type_keywords = false
@@ -93,7 +100,7 @@ require('telescope').setup({
         typescriptreact = { 'typescript', 'javascript', 'react' },
         javascriptreact = { 'javascript', 'react' },
         -- you can also do a string, for example,
-        -- bash = 'sh'
+        -- sh = 'bash'
       },
     }
   }
@@ -107,9 +114,9 @@ If you notice an issue with the default `file_type_keywords` or would like a new
 The public API consists of two main functions.
 
 ```lua
--- See lua/dash.config.lua for full DashConfig type definition
+-- See src/config.rs for available config keys
 -- Also described in configuration section below
----@param config DashConfig
+---@param config
 require('dash').setup(config)
 ```
 
@@ -131,16 +138,51 @@ binary into the `lua/` directory so that it is added to Lua's runtimepath.
 The Rust backend is exposed as a Lua module. To `require` the module, you will need to have the file `libdash_nvim.so` for your architecture (M1 or Intel)
 on your runtimepath, as well as the `deps` directory, which must be in the same directory as the `libdash_nvim.so` shared library file.
 
-The Lua module exports one method, `query`, that takes a list of strings. The first item must be the path to the Dash.app CLI, e.g. `/Applications/Dash.app/Contents/Resources/dashAlfredWorkflow`.
-It also exports some string constants you can use to build the CLI path. See example below:
+### Constants
+
+The Rust backend exports the following constants for use:
+
+- `require('libdash_nvim').DASH_APP_BASE_PATH` => "/Applications/Dash.app"
+- `require('libdash_nvim).DASH_APP_CLI_PATH` => "/Contents/Resources/dashAlfredWorkflow"
+
+### `libdash_nvim.config` (table)
+
+This table stores the internal configuration. You can access it via `require('libdash_nvim').config`.
+See `src/config.rs` or [configuration](#configuration) above for configuration keys.
+
+### `libdash_nvim.default_config` (table)
+
+This table stores the *default* configuration. **You should not modify this table, treat it as read-only.** This is mainly
+to help with merging your custom config with the default config, but can be useful for debugging purposes. For example:
+
+```VimL
+:lua print(vim.inspect(require('libdash_nvim').default_config))
+```
+
+### `libdash_nvim.setup` (function)
+
+This method is used to set the internal configuration of the backend. It takes a table, which will be
+**merged with the default configuration**. See `src/config.rs` or [configuration](#configuration) above
+for configuration keys.
+
+```lua
+require('libdash_nvim').setup({
+  -- your custom configuration here
+})
+```
+
+### `libdash_nvim.query` (function)
+
+This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
+and a boolean indicating whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query({
-  libdash.DASH_APP_BASE_PATH .. libdash.DASH_APP_CLI_PATH,
-  'javascript:array.prototype.filter',
-  'typescript:array.prototype.filter',
-})
+local results = libdash.query(
+  'match arms',
+  'rust',
+  false
+)
 ```
 
 The `query` method returns a table with the following properties:
@@ -151,9 +193,37 @@ The `query` method returns a table with the following properties:
 - `keyword` -- the keyword (if there was one) on the query that returned this result
 - `query` -- the full query that returned this result
 
+If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`. The table will look something like the following:
+
+```lua
+{
+  value = 'https://duckduckgo.com/?q=array.prototype.filter',
+  ordinal = '1',
+  display = 'Search with DuckDuckGo: array.prototype.filter',
+  is_fallback = true,
+}
+```
+
+
+### `libdash_nvim.open_item` (function)
+
+Takes the `value` property of an item returned from querying Dash and opens it in Dash.
+
+```lua
+require('libdash_nvim').open_item(1)
+```
+
 **Note:** if running multiple queries, simply opening `dash-workflow-callback://[value]` may not work directly. Opening the URL assumes that
-the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the CLI again with
-only the `query` value from the selected item, then opening `dash-workflow-callback://[value]`.
+the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the query again with
+only the `query` value from the selected item, then calling `require('libdash_nvim).open` with that item's `value`.
+
+### `libdash_nvim.open_search_engine` (function)
+
+Utility method to open a search engine URL when the fallback item is selected.
+
+```lua
+require('libdash_nvim').open_search_engine('https://duckduckgo.com/?q=array.prototype.filter')
+```
 
 ---
 

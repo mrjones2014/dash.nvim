@@ -5,6 +5,8 @@ use roxmltree::Document;
 use std::result::Result;
 use std::{process::Command, string::FromUtf8Error};
 
+use crate::constants::KEYWORD_PATTERN;
+
 pub struct TelescopeItem {
     pub value: String,
     pub ordinal: String,
@@ -25,15 +27,22 @@ impl Clone for TelescopeItem {
     }
 }
 
-pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> {
+fn remove_rsquo_entities(input: &str) -> String {
+    return input.replace("&rsquo;", "'");
+}
+
+pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
     let raw_output = Command::new(cli_path)
         .args(&[query])
         .output()
         .expect("Failed to execute Dash.app CLI");
     let output_result: Result<String, FromUtf8Error> = String::from_utf8(raw_output.stdout);
-    assert_eq!(output_result.is_ok(), true);
-    let output = output_result.unwrap();
 
+    if !output_result.is_ok() {
+        return Vec::new();
+    }
+
+    let output = remove_rsquo_entities(&output_result.unwrap());
     let mut telescope_items = Vec::new();
 
     let xml_result = Document::parse(&output);
@@ -45,9 +54,9 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
 
     let items_element = doc.descendants().find(|n| n.tag_name().name() == "items");
 
-    let keyword_pattern = Regex::new(r"^([a-zA-Z]+):.+").unwrap();
+    let keyword_pattern = Regex::new(KEYWORD_PATTERN).unwrap();
 
-    items_element.unwrap().children().for_each(|item| {
+    for item in items_element.unwrap().children() {
         let relevant_tags = item.children().filter(|child| {
             let tag_name = child.tag_name().name();
             return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
@@ -61,9 +70,9 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
             _ => {}
         });
 
-        assert_ne!(item_value, "");
-        assert_ne!(title, "");
-        assert_ne!(subtitle, "");
+        if item_value == "" || title == "" || subtitle == "" {
+            continue;
+        }
 
         title = format!("{}: {}", title, subtitle);
 
@@ -83,6 +92,6 @@ pub async fn run_query(cli_path: &String, query: &String) -> Vec<TelescopeItem> 
             keyword: keyword.to_string(),
             query: query.to_string(),
         });
-    });
+    }
     return telescope_items;
 }

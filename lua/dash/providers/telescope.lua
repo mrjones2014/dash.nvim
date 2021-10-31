@@ -1,21 +1,12 @@
 local M = {}
 
-local cli_path = require('dash.config').config.dash_app_path .. require('libdash_nvim').DASH_APP_CLI_PATH
-
 local function finder_fn(current_file_type, bang)
   return function(prompt)
     if not prompt or #prompt == 0 then
       return {}
     end
 
-    local queries = require('dash.query-builder').build_query(current_file_type, prompt, bang)
-
-    if #queries == 0 then
-      return {}
-    end
-
-    table.insert(queries, 1, cli_path)
-    return require('libdash_nvim').query(queries)
+    return require('libdash_nvim').query(prompt, current_file_type, bang)
   end
 end
 
@@ -26,31 +17,36 @@ local function attach_mappings(_, map)
       return
     end
     local libdash = require('libdash_nvim')
-    libdash.query({ cli_path, entry.query })
-    libdash.open_item(entry.value)
+
+    if not entry.is_fallback then
+      libdash.query(entry.query, '', true)
+      libdash.open_item(entry.value)
+    else
+      libdash.open_search_engine(entry.value)
+    end
     require('telescope.actions').close(buffnr)
   end)
   return true
 end
 
-local function build_picker_title()
-  local config = require('dash.config').config
+local function build_picker_title(bang)
+  local config = require('libdash_nvim').config
   local filetype = vim.bo.filetype
   local file_type_keywords = config.file_type_keywords[filetype]
-  if not file_type_keywords then
+  if bang or not file_type_keywords then
     return 'Dash'
   end
 
   if file_type_keywords == true then
-    return 'Dash - ' .. filetype
+    return 'Dash - filtering by: ' .. filetype
   end
 
   if type(file_type_keywords) == 'string' then
-    return 'Dash - ' .. file_type_keywords
+    return 'Dash - filtering by: ' .. file_type_keywords
   end
 
   if type(file_type_keywords) == 'table' then
-    return 'Dash - ' .. (vim.inspect(file_type_keywords)):gsub('\n', '')
+    return 'Dash - filtering by: ' .. (vim.inspect(file_type_keywords)):gsub('\n', '')
   end
 
   return 'Dash'
@@ -73,10 +69,10 @@ function M.build_picker(bang, initial_text)
   })
 
   local picker = Picker:new({
-    prompt_title = build_picker_title(),
+    prompt_title = build_picker_title(bang),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
-    debounce = require('dash.config').config.debounce,
+    debounce = require('libdash_nvim').config.debounce,
     attach_mappings = attach_mappings,
     default_text = initial_text,
   })
