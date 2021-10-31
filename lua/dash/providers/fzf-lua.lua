@@ -34,10 +34,7 @@ function M.setup()
     fzf_opts = {
       ['--query'] = vim.fn.shellescape(last_query),
     },
-    _fzf_cli_args = string.format(
-      '--bind=%s',
-      vim.fn.shellescape(('change:reload:%s'):format(('%s || true'):format(raw_act)))
-    ),
+    _fzf_cli_args = ('--bind=change:execute-silent:%s'):format(vim.fn.shellescape(raw_act)),
   }
 
   coroutine.wrap(function()
