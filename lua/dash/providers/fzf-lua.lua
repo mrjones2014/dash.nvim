@@ -1,48 +1,75 @@
 local M = {}
 
+local _cached_results = {}
+
 local function handle_selected(selected)
+  if not selected or #selected ~= 1 or not _cached_results or #_cached_results < 1 then
+    return
+  end
+
+  local matching_items = vim.tbl_filter(function(item)
+    return item.display == selected[1]
+  end, _cached_results)
+  if not matching_items or #matching_items < 1 then
+    return
+  end
+  local selected_item = matching_items[1]
+  print(vim.inspect(selected_item))
   local libdash = require('libdash_nvim')
-  if selected.is_fallback then
-    libdash.open_search_engine(selected.value)
+  if selected_item.is_fallback then
+    libdash.open_search_engine(selected_item.value)
   else
-    libdash.query(selected.query, '', true)
-    libdash.open_item(selected.value)
+    libdash.query(selected_item.query, '', true)
+    libdash.open_item(selected_item.value)
   end
 end
 
-function M.setup()
-  local last_query = ''
-  local raw_act = require('fzf.actions').raw_action(function(args)
-    print(vim.inspect(args))
-    last_query = args[1]
-  end)
+local default_opts = {
+  exec_empty_query = true,
+  actions = {
+    default = handle_selected,
+  },
+}
 
-  local opts = {
-    prompt = 'Dash> ',
-    fzf_fn = function(add_item)
-      local results = require('libdash_nvim').query('match', 'rust', false)
-      for _, item in pairs(results) do
-        setmetatable(item, {
-          __tostring = function(self)
-            return self.display
-          end,
-        })
-        add_item(item)
-      end
-      add_item(nil)
-    end,
-    fzf_opts = {
-      ['--query'] = vim.fn.shellescape(last_query),
-    },
-    _fzf_cli_args = ('--bind=change:execute-silent:%s'):format(vim.fn.shellescape(raw_act)),
-  }
+M.dash = function(bang)
+  local fzf_lua = require('fzf-lua')
+  local opts = {}
+  opts = fzf_lua.config.normalize_opts(opts, default_opts)
+  if not opts then
+    return
+  end
+
+  opts.prompt = 'Dash> '
+  opts.fzf_opts = { ['--header'] = vim.fn.shellescape(require('dash.providers').build_picker_title(bang)) }
+
+  -- This gets called whenever input is changed
+  -- Also gets called first run if `opts.exec_empty_query == true`
+  local current_file_type = vim.bo.filetype
+  opts._reload_action = function(query)
+    if not query or #query == 0 then
+      return {}
+    end
+
+    local results = require('libdash_nvim').query(query, current_file_type, bang or false)
+    _cached_results = results
+    local items = {}
+    for _, item in pairs(results) do
+      setmetatable(item, {
+        __tostring = function(self)
+          return self.display
+        end,
+      })
+      table.insert(items, item.display)
+    end
+    return items
+  end
+
+  -- This sets all the required fzf arguments for `change:reload` callbacks
+  opts = fzf_lua.core.set_fzf_interactive_cb(opts)
 
   coroutine.wrap(function()
-    local selected = require('fzf-lua.core').fzf_files(opts)
-    if not selected then
-      return
-    end
-    require('fzf-lua.actions').act(handle_selected, selected, opts)
+    local selected = fzf_lua.core.fzf(opts)
+    fzf_lua.actions.act(opts.actions, selected, opts)
   end)()
 end
 
