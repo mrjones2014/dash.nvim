@@ -13,6 +13,25 @@ local function get_keys(tbl)
   return keyset
 end
 
+local function check_fuzzy_finder()
+  local health_ok = vim.fn['health#report_ok']
+  local health_error = vim.fn['health#report_error']
+
+  local telescope_ok, _ = pcall(require, 'telescope')
+  if telescope_ok then
+    health_ok("Fuzzy finder plugin 'telescope' is installed.")
+  end
+
+  local fzf_lua_ok, _ = pcall(require, 'fzf-lua')
+  if fzf_lua_ok then
+    health_ok("Fuzzy finder plugin 'fzf-lua' is installed.")
+  end
+
+  if not telescope_ok and not fzf_lua_ok then
+    health_error('No supported fuzzy finder plugins are installed.')
+  end
+end
+
 function M.check()
   -- health_start begins a new section
   local health_start = vim.fn['health#report_start']
@@ -21,21 +40,8 @@ function M.check()
   local health_info = vim.fn['health#report_info']
 
   health_start('Dependencies')
-  -- check whether we can require('telescope') successfully
-  local telescope_ok, _ = pcall(require, 'telescope')
-  if not telescope_ok then
-    health_error("Module 'telescope' not found.")
-  else
-    health_ok("Module 'telescope' installed.")
-  end
-
-  -- check whether we can require('plenary') successfully
-  local plenary_ok, _ = pcall(require, 'plenary')
-  if not plenary_ok then
-    health_error("Module 'plenary' not found.")
-  else
-    health_ok("Module 'plenary' installed.")
-  end
+  -- check whether we can require one of the supported fuzzy-finders successfully successfully
+  check_fuzzy_finder()
 
   -- ensure config is setup
   require('telescope').load_extension('dash')
