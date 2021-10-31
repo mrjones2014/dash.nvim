@@ -38,6 +38,7 @@ M.dash = function(opts)
     return
   end
 
+  opts.query = opts.initial_text or ''
   opts.prompt = 'Dash> '
   opts.fzf_opts = {
     ['--header'] = vim.fn.shellescape(require('dash.providers').build_picker_title(opts.bang or false)),
@@ -54,11 +55,6 @@ M.dash = function(opts)
     cached_results = require('libdash_nvim').query(query, current_file_type, opts.bang or false)
     local items = {}
     for _, item in pairs(cached_results) do
-      setmetatable(item, {
-        __tostring = function(self)
-          return self.display
-        end,
-      })
       table.insert(items, item.display)
     end
     return items
