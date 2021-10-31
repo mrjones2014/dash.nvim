@@ -10,17 +10,17 @@ local function handle_selected(selected)
   end
 end
 
-local buffer_to_string = function()
-  local content = vim.api.nvim_buf_get_lines(0, 0, vim.api.nvim_buf_line_count(0), false)
-  return table.concat(content, '\n')
-end
-
 function M.setup()
+  local last_query = ''
+  local raw_act = require('fzf.actions').raw_action(function(args)
+    print(vim.inspect(args))
+    last_query = args[1]
+  end)
+
   local opts = {
     prompt = 'Dash> ',
     fzf_fn = function(add_item)
       local results = require('libdash_nvim').query('match', 'rust', false)
-      print(buffer_to_string())
       for _, item in pairs(results) do
         setmetatable(item, {
           __tostring = function(self)
@@ -31,11 +31,17 @@ function M.setup()
       end
       add_item(nil)
     end,
+    fzf_opts = {
+      ['--query'] = vim.fn.shellescape(last_query),
+    },
+    _fzf_cli_args = string.format(
+      '--bind=%s',
+      vim.fn.shellescape(('change:reload:%s'):format(('%s || true'):format(raw_act)))
+    ),
   }
 
   coroutine.wrap(function()
-    local selected = require('fzf-lua.core').fzf(opts, opts.fzf_fn)
-    print(vim.inspect(selected))
+    local selected = require('fzf-lua.core').fzf_files(opts)
     if not selected then
       return
     end
