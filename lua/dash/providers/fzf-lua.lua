@@ -68,7 +68,7 @@ M.dash = function(opts)
   opts = fzf_lua.core.set_fzf_interactive_cb(opts)
 
   coroutine.wrap(function()
-    local selected = fzf_lua.core.fzf(opts)
+    local selected = fzf_lua.core.fzf_files(opts)
     fzf_lua.actions.act(opts.actions, selected, opts)
   end)()
 end
