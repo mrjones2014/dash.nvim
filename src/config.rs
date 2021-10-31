@@ -35,6 +35,7 @@ pub fn init_config(lua: &Lua) -> LuaTable {
     TelescopePrompt = false,
     terminal = false,
     packer = false,
+    fzf = false,
 
     -- filetypes, keep these ones alphabetical
     actionscript = true,
