@@ -29,29 +29,6 @@ local function attach_mappings(_, map)
   return true
 end
 
-local function build_picker_title(bang)
-  local config = require('libdash_nvim').config
-  local filetype = vim.bo.filetype
-  local file_type_keywords = config.file_type_keywords[filetype]
-  if bang or not file_type_keywords then
-    return 'Dash'
-  end
-
-  if file_type_keywords == true then
-    return 'Dash - filtering by: ' .. filetype
-  end
-
-  if type(file_type_keywords) == 'string' then
-    return 'Dash - filtering by: ' .. file_type_keywords
-  end
-
-  if type(file_type_keywords) == 'table' then
-    return 'Dash - filtering by: ' .. (vim.inspect(file_type_keywords)):gsub('\n', '')
-  end
-
-  return 'Dash'
-end
-
 --- Build a Telescope picker for Dash.app and return it
 ---@param bang boolean @bang disables filtering by filetype
 ---@param initial_text string @pre-fill text into the telescope prompt
@@ -69,7 +46,7 @@ function M.build_picker(bang, initial_text)
   })
 
   local picker = Picker:new({
-    prompt_title = build_picker_title(bang),
+    prompt_title = require('dash.providers').build_picker_title(bang),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
     debounce = require('libdash_nvim').config.debounce,
