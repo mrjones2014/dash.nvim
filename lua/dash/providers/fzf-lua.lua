@@ -62,11 +62,7 @@ M.dash = function(opts)
 
   -- This sets all the required fzf arguments for `change:reload` callbacks
   opts = fzf_lua.core.set_fzf_interactive_cb(opts)
-
-  coroutine.wrap(function()
-    local selected = fzf_lua.core.fzf_files(opts)
-    fzf_lua.actions.act(opts.actions, selected, opts)
-  end)()
+  fzf_lua.core.fzf_files(opts)
 end
 
 return M
