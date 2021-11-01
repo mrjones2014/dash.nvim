@@ -18,8 +18,7 @@ local function handle_selected(selected)
   if selected_item.is_fallback then
     libdash.open_search_engine(selected_item.value)
   else
-    libdash.query(selected_item.query, '', true)
-    libdash.open_item(selected_item.value)
+    libdash.open_item(selected_item)
   end
 end
 
