@@ -6,7 +6,7 @@
 
 # Dash.nvim
 
-Query [Dash.app](https://kapeli.com/dash) within Neovim with Telescope or fzf-lua!
+Query [Dash.app](https://kapeli.com/dash) within Neovim with your fuzzy finder!
 
 <!-- panvimdoc-ignore-start -->
 
@@ -20,10 +20,11 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Install
 
-This plugin must be loaded *after* your fuzzy-finder plugin of choice. Currently supported fuzzy-finder plugins are:
+This plugin must be loaded *after* your fuzzy finder plugin of choice. Currently supported fuzzy finder plugins are:
 
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 - [fzf-lua](https://github.com/ibhagwan/fzf-lua)
+- [snap](https://github.com/camspiers/snap)
 
 After installing Dash.nvim, you must run `make install`. This can be done through a post-install hook with most plugin managers.
 
@@ -64,13 +65,19 @@ This plugin has two editor commands, `:Dash` and `:DashWord`, each of which acce
 search Dash.app with keywords based on config (see `file_type_keywords` in [configuration](#configuration)). The bang (`!`)
 will search without this keyword filtering.
 
-`:Dash [query]` will open the fuzzy-finder, and if `[query]` is passed, it will pre-fill the prompt with `[query]`.
+`:Dash [query]` will open the fuzzy finder, and if `[query]` is passed, it will pre-fill the prompt with `[query]`. This
+is essentially an alias to `:lua require('dash').search(bang, [query])`.
 
-`:DashWord` will open the fuzzy-finder and pre-fill the prompt with the word under the cursor.
+`:DashWord` will open the fuzzy finder and pre-fill the prompt with the word under the cursor. This is essentially
+an alias to `:lua require('dash').search(bang, <cword>)`.
 
-If using Telescope, these can also be accessed via `:Telescope dash search`, `:Telescope dash search_no_filter`, or
-`:lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' })`.
-If using fzf-lua, you can use `:FzfLua dash`, or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`.
+The Lua function `require('dash').search()` will bind to the first supported fuzzy finder plugin it detects. Having multiple fuzzy finder
+plugins installed will result in undefined behavior. You can use a specific fuzzy finder's provider directly via
+`:lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' })`, for example.
+
+If using Telescope, you can also run `:Telescope dash search` or `:Telescope dash search_no_filter`.
+
+If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`, for example.
 
 ## Configuration
 
@@ -109,6 +116,8 @@ If using fzf-lua, you can use `:FzfLua dash`, or `:lua require('fzf-lua').dash({
 }
 ```
 
+If you notice an issue with the default config or would like a new filetype added, please file an issue or submit a PR!
+
 ### With Telescope
 
 ```lua
@@ -121,16 +130,13 @@ require('telescope').setup({
 })
 ```
 
-### With fzf-lua
+### With fzf-lua or Snap
 
 ```lua
 require('dash').setup({
   -- your config here
 })
 ```
-
-
-If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
 
 ### Lua API
 
@@ -144,7 +150,7 @@ require('dash').setup(config)
 ```
 
 ```lua
---- This will bind to the first fuzzy-finder it finds to be available,
+--- This will bind to the first fuzzy finder it finds to be available,
 --- checked in order: telescope, fzf-lua
 ---@param bang boolean @bang searches without any filtering
 ---@param initial_text string @pre-fill text into the finder prompt
@@ -232,7 +238,7 @@ If no items are returned from querying Dash, it will return a single item with a
 
 ### `libdash_nvim.open_item` (function)
 
-Takes the `value` property of an item returned from querying Dash and opens it in Dash.
+Takes an item returned from querying Dash via the `require('libdash_nvim').query` function and opens it in Dash.
 
 ```lua
 local libdash = require('libdash_nvim')
@@ -240,10 +246,6 @@ local results = libdash.query('match arms', 'rust', false)
 local selected = results[1]
 require('libdash_nvim').open_item(selected)
 ```
-
-**Note:** if running multiple queries, simply opening `dash-workflow-callback://[value]` may not work directly. Opening the URL assumes that
-the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the query again with
-only the `query` value from the selected item, then calling `require('libdash_nvim).open` with that item's `value`.
 
 ### `libdash_nvim.open_search_engine` (function)
 
@@ -278,5 +280,8 @@ using `make watch`.
 
 ### Code Style
 
-Use `snake_case` for everything. All Lua code should be checked and formatted with `luacheck` and `stylua`.
+Use `snake_case` for everything. All Lua code should be checked and formatted with `luacheck` and `stylua`. Only
+presentation-layer code (such as providers for various fuzzy finder plugins) should be in the Lua code, any core
+functionality most likely belongs in the Rust backend.
+
 All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer).
