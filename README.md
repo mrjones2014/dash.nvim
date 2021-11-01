@@ -68,32 +68,13 @@ will search without this keyword filtering.
 
 `:DashWord` will open the fuzzy-finder and pre-fill the prompt with the word under the cursor.
 
-If using Telescope, these can also be accessed via `:Telescope dash search` and `:Telescope dash search_no_filter`.
+If using Telescope, these can also be accessed via `:Telescope dash search`, `:Telescope dash search_no_filter`, or
+`:lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' })`.
 If using fzf-lua, you can use `:FzfLua dash`, or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`.
 
 ## Configuration
 
-### With Telescope
-
-```lua
-require('telescope').setup({
-  extensions = {
-    dash = {
-      -- your config here
-    }
-  }
-})
-```
-
-### With fzf-lua
-
-```lua
-require('dash').setup({
-  -- your config here
-})
-```
-
-Options and defaults are described below:
+### Configuration Table Structure
 
 ```lua
 {
@@ -127,6 +108,27 @@ Options and defaults are described below:
   },
 }
 ```
+
+### With Telescope
+
+```lua
+require('telescope').setup({
+  extensions = {
+    dash = {
+      -- your config here
+    }
+  }
+})
+```
+
+### With fzf-lua
+
+```lua
+require('dash').setup({
+  -- your config here
+})
+```
+
 
 If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
 
@@ -233,7 +235,10 @@ If no items are returned from querying Dash, it will return a single item with a
 Takes the `value` property of an item returned from querying Dash and opens it in Dash.
 
 ```lua
-require('libdash_nvim').open_item(1)
+local libdash = require('libdash_nvim')
+local results = libdash.query('match arms', 'rust', false)
+local selected = results[1]
+require('libdash_nvim').open_item(selected)
 ```
 
 **Note:** if running multiple queries, simply opening `dash-workflow-callback://[value]` may not work directly. Opening the URL assumes that
@@ -273,6 +278,5 @@ using `make watch`.
 
 ### Code Style
 
-Use `snake_case` for everything. Ensure you use [EmmyLua Annotations](https://github.com/sumneko/lua-language-server/wiki/EmmyLua%2DAnnotations)
-for any public-facing API, and optionally for non-public functions, if the function is non-trivial or the types are not obvious.
-Other than that, running `luacheck` and `stylua` should cover it.
+Use `snake_case` for everything. All Lua code should be checked and formatted with `luacheck` and `stylua`.
+All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer).

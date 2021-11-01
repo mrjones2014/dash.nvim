@@ -27,7 +27,12 @@ local function check_fuzzy_finder()
     health_ok("Fuzzy finder plugin 'fzf-lua' is installed.")
   end
 
-  if not telescope_ok and not fzf_lua_ok then
+  local snap_ok, _ = pcall(require, 'snap')
+  if snap_ok then
+    health_ok("Fuzzy finder plugin 'snap' is installed.")
+  end
+
+  if not telescope_ok and not fzf_lua_ok and not snap_ok then
     health_error('No supported fuzzy finder plugins are installed.')
   end
 end

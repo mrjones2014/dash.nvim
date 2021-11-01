@@ -19,7 +19,7 @@ local function handle_selected(selected)
     libdash.open_search_engine(selected_item.value)
   else
     libdash.query(selected_item.query, '', true)
-    libdash.open_item(selected_item.value)
+    libdash.open_item(selected_item)
   end
 end
 

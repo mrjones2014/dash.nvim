@@ -3,7 +3,7 @@ use std::process::Command;
 use std::str::FromStr;
 
 use crate::cli_runner::run_query;
-use crate::cli_runner::TelescopeItem;
+use crate::cli_runner::DashItem;
 use crate::config::get_config_table;
 use crate::constants::DASH_APP_BASE_PATH;
 use crate::constants::DASH_APP_CLI_PATH;
@@ -15,8 +15,8 @@ use futures::future::join_all;
 use mlua::prelude::*;
 use tokio::runtime::Runtime;
 
-async fn query_async<'a>(cli_path: &'a str, queries: &'a Vec<String>) -> Vec<TelescopeItem> {
-    let mut results: Vec<TelescopeItem> = Vec::new();
+async fn query_async<'a>(cli_path: &'a str, queries: &'a Vec<String>) -> Vec<DashItem> {
+    let mut results: Vec<DashItem> = Vec::new();
     let mut futures = Vec::new();
     for i in 0..queries.len() {
         let query = queries.get(i).unwrap();
@@ -34,7 +34,7 @@ async fn query_async<'a>(cli_path: &'a str, queries: &'a Vec<String>) -> Vec<Tel
     return results;
 }
 
-fn query_sync(cli_path: String, queries: Vec<String>) -> Vec<TelescopeItem> {
+fn query_sync(cli_path: String, queries: Vec<String>) -> Vec<DashItem> {
     let (tx, rx) = channel::bounded(1);
     let runtime = Runtime::new().unwrap();
     let handle = runtime.handle();
@@ -152,12 +152,19 @@ pub fn query<'a>(
     );
 }
 
-pub fn open_item(_: &Lua, item_num: c_double) -> Result<bool, LuaError> {
-    Command::new("open")
-        .args(&["-g", &format!("dash-workflow-callback://{}", item_num)])
-        .output()
-        .expect("Failed to open Dash.app");
-    return Ok(true);
+pub fn open_item(lua: &Lua, item: LuaTable) -> Result<bool, LuaError> {
+    let query_str: String = item.get("query").unwrap();
+    let id: c_double = item.get("value").unwrap();
+    let results = query(lua, (query_str, "".to_string(), true));
+    if results.is_ok() {
+        Command::new("open")
+            .args(&["-g", &format!("dash-workflow-callback://{}", id)])
+            .output()
+            .expect("Failed to open Dash.app");
+        return Ok(true);
+    }
+
+    return Err(results.unwrap_err());
 }
 
 pub fn open_search_engine(_: &Lua, url: String) -> Result<bool, LuaError> {

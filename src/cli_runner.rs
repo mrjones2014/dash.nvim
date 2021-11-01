@@ -7,7 +7,7 @@ use std::{process::Command, string::FromUtf8Error};
 
 use crate::constants::KEYWORD_PATTERN;
 
-pub struct TelescopeItem {
+pub struct DashItem {
     pub value: String,
     pub ordinal: String,
     pub display: String,
@@ -15,9 +15,9 @@ pub struct TelescopeItem {
     pub query: String,
 }
 
-impl Clone for TelescopeItem {
+impl Clone for DashItem {
     fn clone(&self) -> Self {
-        return TelescopeItem {
+        return DashItem {
             value: self.value.to_string(),
             ordinal: self.ordinal.to_string(),
             display: self.display.to_string(),
@@ -31,7 +31,7 @@ fn remove_rsquo_entities(input: &str) -> String {
     return input.replace("&rsquo;", "'");
 }
 
-pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
+pub async fn run_query(cli_path: &str, query: &str) -> Vec<DashItem> {
     let raw_output = Command::new(cli_path)
         .args(&[query])
         .output()
@@ -85,7 +85,7 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<TelescopeItem> {
                 .unwrap()
                 .as_str();
         }
-        telescope_items.push(TelescopeItem {
+        telescope_items.push(DashItem {
             value: item_value.to_string(),
             ordinal: title.to_string(),
             display: title.to_string(),
