@@ -1,4 +1,4 @@
-name: Lint, Check, and Test
+name: Run All Checks
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
     branches: [ master ]
 
 jobs:
-  lint-check-test:
-    name: Luacheck, Stylua, and Tests
-    runs-on: ubuntu-latest
+  check-lua:
+    name: Luacheck, Stylua, and Lua Tests
+    runs-on: macos-11
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -19,15 +19,15 @@ jobs:
         neovim: true
         version: v0.5.0
 
-    - name: Setup ‘lua’
+    - name: Setup 'lua'
       uses: leafo/gh-actions-lua@v8
       with:
         luaVersion: "5.1.5"
 
-    - name: Setup ‘luarocks’
+    - name: Setup 'luarocks'
       uses: leafo/gh-actions-luarocks@v4
 
-    - name: Run stylua
+    - name: Run luacheck
       run: |
         luarocks install luacheck
         luacheck .

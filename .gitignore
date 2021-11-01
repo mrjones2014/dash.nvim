@@ -1,0 +1,4 @@
+/target/
+doc/tags
+lua/libdash_nvim.so
+lua/deps/

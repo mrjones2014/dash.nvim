@@ -1,0 +1,321 @@
+*dash.txt*                         Search Dash.app from Neovim with Telescope.
+
+==============================================================================
+Table of Contents                                     *dash-table-of-contents*
+
+1. Dash.nvim                                                  |dash-dash.nvim|
+  - Install                                                     |dash-install|
+  - Usage                                                         |dash-usage|
+  - Configuration                                         |dash-configuration|
+  - Backend                                                     |dash-backend|
+  - Contributing                                           |dash-contributing|
+
+==============================================================================
+1. Dash.nvim                                                  *dash-dash.nvim*
+
+Query Dash.app <https://kapeli.com/dash> within Neovim with Telescope or
+fzf-lua!
+
+Note: Dash is a Mac-only app, so you’ll only find this plugin useful on Mac.
+
+INSTALL                                                         *dash-install*
+
+This plugin must be loaded _after_ your fuzzy-finder plugin of choice.
+Currently supported fuzzy-finder plugins are:
+
+
+- telescope.nvim <https://github.com/nvim-telescope/telescope.nvim>
+- fzf-lua <https://github.com/ibhagwan/fzf-lua>
+
+
+After installing Dash.nvim, you must run `make install`. This can be done
+through a post-install hook with most plugin managers.
+
+Packer:
+
+>
+    use({
+      'mrjones2014/dash.nvim',
+      run = 'make install',
+    })
+<
+
+
+Paq:
+
+>
+    require("paq")({
+      { 'mrjones2014/dash.nvim', run = 'make install' };
+    })
+<
+
+
+Vim-Plug:
+
+>
+    Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
+<
+
+
+USAGE                                                             *dash-usage*
+
+EDITOR COMMANDS ~
+
+This plugin has two editor commands, `:Dash` and `:DashWord`, each of which
+accept a bang (`!`). By default, it will search Dash.app with keywords based on
+config (see `file_type_keywords` in |dash-configuration|). The bang (`!`) will
+search without this keyword filtering.
+
+`:Dash [query]` will open the fuzzy-finder, and if `[query]` is passed, it will
+pre-fill the prompt with `[query]`.
+
+`:DashWord` will open the fuzzy-finder and pre-fill the prompt with the word
+under the cursor.
+
+If using Telescope, these can also be accessed via `:Telescope dash search` and
+`:Telescope dash search_no_filter`. If using fzf-lua, you can use `:FzfLua
+dash`, or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`.
+
+CONFIGURATION                                             *dash-configuration*
+
+WITH TELESCOPE ~
+
+>
+    require('telescope').setup({
+      extensions = {
+        dash = {
+          -- your config here
+        }
+      }
+    })
+<
+
+
+WITH FZF-LUA ~
+
+>
+    require('dash').setup({
+      -- your config here
+    })
+<
+
+
+Options and defaults are described below:
+
+>
+    {
+      -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
+      dash_app_path = '/Applications/Dash.app',
+      -- search engine to fall back to when Dash has no results, must be one of: 'ddg', 'duckduckgo', 'startpage', 'google'
+      search_engine = 'ddg',
+      -- debounce while typing, in milliseconds
+      debounce = 0,
+      -- map filetype strings to the keywords you've configured for docsets in Dash
+      -- setting to false will disable filtering by filetype for that filetype
+      -- filetypes not included in this table will not filter the query by filetype
+      -- check src/config.rs to see all defaults
+      -- the values you pass for file_type_keywords are merged with the defaults
+      -- to disable filtering for all filetypes,
+      -- set file_type_keywords = false
+      file_type_keywords = {
+        dashboard = false,
+        NvimTree = false,
+        TelescopePrompt = false,
+        terminal = false,
+        packer = false,
+        fzf = false,
+        -- a table of strings will search on multiple keywords
+        javascript = { 'javascript', 'nodejs' },
+        typescript = { 'typescript', 'javascript', 'nodejs' },
+        typescriptreact = { 'typescript', 'javascript', 'react' },
+        javascriptreact = { 'javascript', 'react' },
+        -- you can also do a string, for example,
+        -- sh = 'bash'
+      },
+    }
+<
+
+
+If you notice an issue with the default `file_type_keywords` or would like a
+new filetype added, please file an issue or submit a PR!
+
+LUA API ~
+
+The public API consists of two main functions.
+
+>
+    -- See src/config.rs for available config keys
+    -- Also described in configuration section below
+    ---@param config
+    require('dash').setup(config)
+<
+
+
+>
+    --- This will bind to the first fuzzy-finder it finds to be available,
+    --- checked in order: telescope, fzf-lua
+    ---@param bang boolean @bang searches without any filtering
+    ---@param initial_text string @pre-fill text into the finder prompt
+    require('dash').search(bang, initial_text)
+<
+
+
+See |dash-backend| for documentation on the backend data provider.
+
+BACKEND                                                         *dash-backend*
+
+The binaries for the Rust backend can be found under `bin/`, compiled for Mac
+M1 and Intel architectures. To build from source, you will need a Rust
+toolchain, which can be installed from rustup.rs <https://rustup.rs>. Once this
+is installed, you should be able to build via `make build`. Then, `make
+install` will copy the correct binary into the `lua/` directory so that it is
+added to Lua’s runtimepath.
+
+The Rust backend is exposed as a Lua module. To `require` the module, you will
+need to have the file `libdash_nvim.so` for your architecture (M1 or Intel) on
+your runtimepath, as well as the `deps` directory, which must be in the same
+directory as the `libdash_nvim.so` shared library file.
+
+CONSTANTS ~
+
+The Rust backend exports the following constants for use:
+
+
+- `require('libdash_nvim').DASH_APP_BASE_PATH` => "/Applications/Dash.app"
+- `require('libdash_nvim).DASH_APP_CLI_PATH` => "/Contents/Resources/dashAlfredWorkflow"
+
+
+`LIBDASH_NVIM.CONFIG` (TABLE) ~
+
+This table stores the internal configuration. You can access it via
+`require('libdash_nvim').config`. See `src/config.rs` or |dash-configuration|
+above for configuration keys.
+
+`LIBDASH_NVIM.DEFAULT_CONFIG` (TABLE) ~
+
+This table stores the _default_ configuration. **You should not modify this
+table, treat it as read-only.** This is mainly to help with merging your custom
+config with the default config, but can be useful for debugging purposes. For
+example:
+
+>
+    :lua print(vim.inspect(require('libdash_nvim').default_config))
+<
+
+
+`LIBDASH_NVIM.SETUP` (FUNCTION) ~
+
+This method is used to set the internal configuration of the backend. It takes
+a table, which will be **merged with the default configuration**. See
+`src/config.rs` or |dash-configuration| above for configuration keys.
+
+>
+    require('libdash_nvim').setup({
+      -- your custom configuration here
+    })
+<
+
+
+`LIBDASH_NVIM.QUERY` (FUNCTION) ~
+
+This method (`require('libdash_nivm').query`) takes 3 arguments: the search
+text, the current buffer type, and a boolean indicating whether to disable
+filetype filtering (e.g. command was run with bang, `:Dash!`).
+
+>
+    local libdash = require('libdash_nvim')
+    local results = libdash.query(
+      'match arms',
+      'rust',
+      false
+    )
+<
+
+
+The `query` method returns a table with the following properties:
+
+
+- `value` – the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
+- `ordinal` – a value to sort by, currently this is the same value as `display`
+- `display` – a display value
+- `keyword` – the keyword (if there was one) on the query that returned this result
+- `query` – the full query that returned this result
+
+
+If no items are returned from querying Dash, it will return a single item with
+an extra key, `is_fallback = true`. The table will look something like the
+following:
+
+>
+    {
+      value = 'https://duckduckgo.com/?q=array.prototype.filter',
+      ordinal = '1',
+      display = 'Search with DuckDuckGo: array.prototype.filter',
+      is_fallback = true,
+    }
+<
+
+
+`LIBDASH_NVIM.OPEN_ITEM` (FUNCTION) ~
+
+Takes the `value` property of an item returned from querying Dash and opens it
+in Dash.
+
+>
+    require('libdash_nvim').open_item(1)
+<
+
+
+**Note:** if running multiple queries, simply opening
+`dash-workflow-callback://[value]` may not work directly. Opening the URL
+assumes that the value being opened was returned by the currently active query
+in Dash.app. You can work around this by just running the query again with only
+the `query` value from the selected item, then calling
+`require('libdash_nvim).open` with that item’s `value`.
+
+`LIBDASH_NVIM.OPEN_SEARCH_ENGINE` (FUNCTION) ~
+
+Utility method to open a search engine URL when the fallback item is selected.
+
+>
+    require('libdash_nvim').open_search_engine('https://duckduckgo.com/?q=array.prototype.filter')
+<
+
+
+------------------------------------------------------------------------------
+
+CONTRIBUTING                                               *dash-contributing*
+
+GIT HOOKS ~
+
+If you plan on changing Rust code, you will need to install the git hooks via
+`make install-hooks`. The git hooks require you have a Rust toolchain
+installed. You can install a Rust toolchain from rustup.rs <https://rustup.rs>.
+
+RUNNING TESTS ~
+
+This uses busted <https://github.com/Olivine-Labs/busted>, luassert
+<https://github.com/Olivine-Labs/luassert> (both through plenary.nvim
+<https://github.com/nvim-lua/plenary.nvim>) and matcher_combinators
+<https://github.com/m00qek/matcher_combinators.lua> to define tests in `spec/`
+directory. These dependencies are required only to run tests, that’s why they
+are installed as git submodules.
+
+To run tests, run `make test`. This runs tests in Neovim with a minimal
+profile, spec.vim <./spec/spec.vim>. This runs Neovim with only this plugin,
+and the testing dependencies.
+
+If you have entr(1) <https://eradman.com/entrproject/> installed, you can run
+the tests in watch mode using `make watch`.
+
+CODE STYLE ~
+
+Use `snake_case` for everything. Ensure you use EmmyLua Annotations
+<https://github.com/sumneko/lua-language-server/wiki/EmmyLua%2DAnnotations> for
+any public-facing API, and optionally for non-public functions, if the function
+is non-trivial or the types are not obvious. Other than that, running
+`luacheck` and `stylua` should cover it.
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:
