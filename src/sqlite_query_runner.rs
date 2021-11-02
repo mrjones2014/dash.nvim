@@ -1,23 +1,31 @@
+use std::path::Path;
+
 use rusqlite::{Connection, OpenFlags};
 
-use crate::cli_runner::TelescopeItem;
+use crate::cli_runner::DashItem;
 
 fn query_docset(
     database: &str,
     query: &str,
     keyword: &str,
-) -> Result<Vec<TelescopeItem>, rusqlite::Error> {
+) -> Result<Vec<DashItem>, rusqlite::Error> {
+    if !Path::new(database).exists() {
+        return Ok(Vec::new());
+    }
+
     let conn = Connection::open_with_flags(database, OpenFlags::SQLITE_OPEN_READ_ONLY).unwrap();
-    let ztoken_query = conn
+    let mut sql_query = conn
         .prepare("SELECT ID, NAME, TYPE, PATH FROM SEARCHINDEX WHERE NAME LIKE '%?%'")
         .unwrap();
-    let query_result = ztoken_query
+    let query_result = sql_query
         .query_map(&[query], |row| {
-            let title = format!("{}: {}", row.get(2).unwrap(), row.get(1).unwrap());
-            return Ok(TelescopeItem {
+            let name: String = row.get(1)?;
+            let item_type: String = row.get(2)?;
+            let title = format!("{}: {}", item_type, name);
+            return Ok(DashItem {
                 value: row.get(0)?,
-                ordinal: title,
-                display: title,
+                ordinal: title.to_string(),
+                display: title.to_string(),
                 keyword: keyword.to_string(),
                 query: query.to_string(),
             });
