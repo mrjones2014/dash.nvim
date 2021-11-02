@@ -6,7 +6,7 @@
 
 # Dash.nvim
 
-Query [Dash.app](https://kapeli.com/dash) within Neovim with a Telescope picker!
+Query [Dash.app](https://kapeli.com/dash) within Neovim with your fuzzy finder!
 
 <!-- panvimdoc-ignore-start -->
 
@@ -20,6 +20,12 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Install
 
+This plugin must be loaded *after* your fuzzy finder plugin of choice. Currently supported fuzzy finder plugins are:
+
+- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- [fzf-lua](https://github.com/ibhagwan/fzf-lua)
+- [snap](https://github.com/camspiers/snap)
+
 After installing Dash.nvim, you must run `make install`. This can be done through a post-install hook with most plugin managers.
 
 Packer:
@@ -27,9 +33,7 @@ Packer:
 ```lua
 use({
   'mrjones2014/dash.nvim',
-  requires = { 'nvim-telescope/telescope.nvim' },
   run = 'make install',
-  disable = not vim.fn.has('macunix'),
 })
 ```
 
@@ -37,15 +41,13 @@ Paq:
 
 ```lua
 require("paq")({
-  'nvim-telescope/telescope.nvim';
-  {'mrjones2014/dash.nvim', run = 'make install'};
+  { 'mrjones2014/dash.nvim', run = 'make install' };
 })
 ```
 
 Vim-Plug:
 
 ```VimL
-Plug 'nvim-telescope/telescope.nvim'
 Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
 ```
 
@@ -63,51 +65,78 @@ This plugin has two editor commands, `:Dash` and `:DashWord`, each of which acce
 search Dash.app with keywords based on config (see `file_type_keywords` in [configuration](#configuration)). The bang (`!`)
 will search without this keyword filtering.
 
-`:Dash [query]` will open the Telescope picker, and if `[query]` is passed, it will pre-fill the prompt with `[query]`.
+`:Dash [query]` will open the fuzzy finder, and if `[query]` is passed, it will pre-fill the prompt with `[query]`. This
+is essentially an alias to `:lua require('dash').search(bang, [query])`.
 
-`:DashWord` will open the Telescope picker and pre-fill the prompt with the word under the cursor.
+`:DashWord` will open the fuzzy finder and pre-fill the prompt with the word under the cursor. This is essentially
+an alias to `:lua require('dash').search(bang, <cword>)`.
+
+The Lua function `require('dash').search()` will bind to the first supported fuzzy finder plugin it detects. Having multiple fuzzy finder
+plugins installed will result in undefined behavior. You can use a specific fuzzy finder's provider directly via
+`:lua require('dash.providers.telescope').dash({ bang = false, initial_text = '' })`, for example.
+
+If using Telescope, you can also run `:Telescope dash search` or `:Telescope dash search_no_filter`.
+
+If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`, for example.
 
 ## Configuration
 
-`dash.nvim` can be configured in your Telescope config. Options and defaults are described below:
+### Configuration Table Structure
+
+```lua
+{
+  -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
+  dash_app_path = '/Applications/Dash.app',
+  -- search engine to fall back to when Dash has no results, must be one of: 'ddg', 'duckduckgo', 'startpage', 'google'
+  search_engine = 'ddg',
+  -- debounce while typing, in milliseconds
+  debounce = 0,
+  -- map filetype strings to the keywords you've configured for docsets in Dash
+  -- setting to false will disable filtering by filetype for that filetype
+  -- filetypes not included in this table will not filter the query by filetype
+  -- check src/config.rs to see all defaults
+  -- the values you pass for file_type_keywords are merged with the defaults
+  -- to disable filtering for all filetypes,
+  -- set file_type_keywords = false
+  file_type_keywords = {
+    dashboard = false,
+    NvimTree = false,
+    TelescopePrompt = false,
+    terminal = false,
+    packer = false,
+    fzf = false,
+    -- a table of strings will search on multiple keywords
+    javascript = { 'javascript', 'nodejs' },
+    typescript = { 'typescript', 'javascript', 'nodejs' },
+    typescriptreact = { 'typescript', 'javascript', 'react' },
+    javascriptreact = { 'javascript', 'react' },
+    -- you can also do a string, for example,
+    -- sh = 'bash'
+  },
+}
+```
+
+If you notice an issue with the default config or would like a new filetype added, please file an issue or submit a PR!
+
+### With Telescope
 
 ```lua
 require('telescope').setup({
   extensions = {
     dash = {
-      -- configure path to Dash.app if installed somewhere other than /Applications/Dash.app
-      dash_app_path = '/Applications/Dash.app',
-      -- search engine to fall back to when Dash has no results, must be one of: 'ddg', 'duckduckgo', 'startpage', 'google'
-      search_engine = 'ddg',
-      -- debounce while typing, in milliseconds
-      debounce = 0,
-      -- map filetype strings to the keywords you've configured for docsets in Dash
-      -- setting to false will disable filtering by filetype for that filetype
-      -- filetypes not included in this table will not filter the query by filetype
-      -- check src/config.rs to see all defaults
-      -- the values you pass for file_type_keywords are merged with the defaults
-      -- to disable filtering for all filetypes,
-      -- set file_type_keywords = false
-      file_type_keywords = {
-        dashboard = false,
-        NvimTree = false,
-        TelescopePrompt = false,
-        terminal = false,
-        packer = false,
-        -- a table of strings will search on multiple keywords
-        javascript = { 'javascript', 'nodejs' },
-        typescript = { 'typescript', 'javascript', 'nodejs' },
-        typescriptreact = { 'typescript', 'javascript', 'react' },
-        javascriptreact = { 'javascript', 'react' },
-        -- you can also do a string, for example,
-        -- sh = 'bash'
-      },
+      -- your config here
     }
   }
 })
 ```
 
-If you notice an issue with the default `file_type_keywords` or would like a new filetype added, please file an issue or submit a PR!
+### With fzf-lua or Snap
+
+```lua
+require('dash').setup({
+  -- your config here
+})
+```
 
 ### Lua API
 
@@ -121,8 +150,10 @@ require('dash').setup(config)
 ```
 
 ```lua
+--- This will bind to the first fuzzy finder it finds to be available,
+--- checked in order: telescope, fzf-lua
 ---@param bang boolean @bang searches without any filtering
----@param initial_text string @pre-fill text into the telescope picker
+---@param initial_text string @pre-fill text into the finder prompt
 require('dash').search(bang, initial_text)
 ```
 
@@ -207,15 +238,14 @@ If no items are returned from querying Dash, it will return a single item with a
 
 ### `libdash_nvim.open_item` (function)
 
-Takes the `value` property of an item returned from querying Dash and opens it in Dash.
+Takes an item returned from querying Dash via the `require('libdash_nvim').query` function and opens it in Dash.
 
 ```lua
-require('libdash_nvim').open_item(1)
+local libdash = require('libdash_nvim')
+local results = libdash.query('match arms', 'rust', false)
+local selected = results[1]
+require('libdash_nvim').open_item(selected)
 ```
-
-**Note:** if running multiple queries, simply opening `dash-workflow-callback://[value]` may not work directly. Opening the URL assumes that
-the value being opened was returned by the currently active query in Dash.app. You can work around this by just running the query again with
-only the `query` value from the selected item, then calling `require('libdash_nvim).open` with that item's `value`.
 
 ### `libdash_nvim.open_search_engine` (function)
 
@@ -250,6 +280,8 @@ using `make watch`.
 
 ### Code Style
 
-Use `snake_case` for everything. Ensure you use [EmmyLua Annotations](https://github.com/sumneko/lua-language-server/wiki/EmmyLua%2DAnnotations)
-for any public-facing API, and optionally for non-public functions, if the function is non-trivial or the types are not obvious.
-Other than that, running `luacheck` and `stylua` should cover it.
+Use `snake_case` for everything. All Lua code should be checked and formatted with `luacheck` and `stylua`. Only
+presentation-layer code (such as providers for various fuzzy finder plugins) should be in the Lua code, any core
+functionality most likely belongs in the Rust backend.
+
+All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer).
