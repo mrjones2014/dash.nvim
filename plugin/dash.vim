@@ -13,3 +13,10 @@ command! -nargs=* -bang Dash :call <SID>dash_nvim_search(<bang>0, <q-args>)
 command! -nargs=0 -bang DashWord :call <SID>dash_nvim_search(<bang>0, expand('<cword>'))
 
 lua require('dash.startup').init()
+
+if $DASH_NVIM_DEV
+  function s:dash_nvim_reload()
+    :lua require('__dash-dev').reload_dash()
+  endfunction
+  command! -nargs=0 DashDevReload :call <SID>dash_nvim_reload()
+endif
