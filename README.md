@@ -265,6 +265,29 @@ If you plan on changing Rust code, you will need to install the git hooks via `m
 The git hooks require you have a Rust toolchain installed. You can install a Rust toolchain from
 [rustup.rs](https://rustup.rs).
 
+### Developing Locally
+
+The best way to develop and test locally is to install the plugin from a locally cloned repository.
+If you're using Packer, you can just do:
+
+```lua
+use({
+  '~/git/dash.nvim', -- or whatever your local path is
+  run = 'make install',
+})
+```
+
+Otherwise you can add it manually via:
+
+```lua
+vim.opt.runtimepath:append('~/git/dash.nvim') -- or whatever your local path is
+```
+
+There is also a `make dev` task which will set the `$DASH_NVIM_DEV` environment variable and open `nvim` for you.
+When the `$DASH_NVIM_DEV` environment variable is set, there will be an extra command available, `:DashDevReload`.
+This will reload Telescope, fzf-lua, and Snap (whichever ones you have installed), as well as the `dash` and `libdash_nvim`
+Lua modules.
+
 ### Running Tests
 
 This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
