@@ -83,6 +83,9 @@ fn run_query_sync<'a>(
         result_lua_table
             .set("query", result.query.to_string())
             .unwrap();
+        result_lua_table
+            .set("preview_url", result.preview_url.to_string())
+            .unwrap();
 
         lua_result_list
             .raw_insert(i, result_lua_table.to_owned())

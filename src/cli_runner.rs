@@ -13,6 +13,7 @@ pub struct DashItem {
     pub display: String,
     pub keyword: String,
     pub query: String,
+    pub preview_url: String,
 }
 
 impl Clone for DashItem {
@@ -23,6 +24,7 @@ impl Clone for DashItem {
             display: self.display.to_string(),
             keyword: self.keyword.to_string(),
             query: self.query.to_string(),
+            preview_url: self.preview_url.to_string(),
         };
     }
 }
@@ -43,12 +45,12 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<DashItem> {
     }
 
     let output = remove_rsquo_entities(&output_result.unwrap());
-    let mut telescope_items = Vec::new();
+    let mut dash_items = Vec::new();
 
     let xml_result = Document::parse(&output);
     let doc;
     match xml_result {
-        Err(_) => return telescope_items,
+        Err(_) => return dash_items,
         Ok(value) => doc = value,
     }
 
@@ -59,14 +61,19 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<DashItem> {
     for item in items_element.unwrap().children() {
         let relevant_tags = item.children().filter(|child| {
             let tag_name = child.tag_name().name();
-            return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
+            return tag_name == "text"
+                || tag_name == "title"
+                || tag_name == "subtitle"
+                || tag_name == "quicklookurl";
         });
         let item_value: String = item.attribute("arg").unwrap().to_string();
         let mut title: String = "".to_string();
         let mut subtitle: String = "".to_string();
+        let mut preview_url: String = "".to_string();
         relevant_tags.for_each(|child| match child.tag_name().name() {
             "title" => title = child.text().unwrap().to_string(),
             "subtitle" => subtitle = child.text().unwrap().to_string(),
+            "quicklookurl" => preview_url = child.text().unwrap().to_string(),
             _ => {}
         });
 
@@ -85,13 +92,14 @@ pub async fn run_query(cli_path: &str, query: &str) -> Vec<DashItem> {
                 .unwrap()
                 .as_str();
         }
-        telescope_items.push(DashItem {
+        dash_items.push(DashItem {
             value: item_value.to_string(),
             ordinal: title.to_string(),
             display: title.to_string(),
             keyword: keyword.to_string(),
             query: query.to_string(),
+            preview_url: preview_url.to_string(),
         });
     }
-    return telescope_items;
+    return dash_items;
 }

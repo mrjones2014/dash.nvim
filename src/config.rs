@@ -1,16 +1,6 @@
+use crate::constants;
 use mlua::prelude::{LuaError, LuaFunction, LuaTable, LuaValue};
 use mlua::{FromLua, Lua};
-
-use crate::constants;
-
-fn set_config(config: &LuaTable, new_config: &LuaTable, key: &str) {
-    if new_config.contains_key(key).unwrap() {
-        let new_value = new_config
-            .get(key)
-            .unwrap_or(config.get::<&str, LuaValue>(key).unwrap());
-        config.set(key, new_value).unwrap();
-    }
-}
 
 pub fn get_config_table(lua: &Lua) -> LuaTable {
     let require: LuaFunction = lua.globals().get("require").unwrap();
@@ -26,6 +16,7 @@ pub fn init_config(lua: &Lua) -> LuaTable {
                 r#"
 {{
   dash_app_path = '{}',
+  browsh_path = 'browsh',
   search_engine = 'ddg',
   debounce = 0,
   file_type_keywords = {{
@@ -101,9 +92,23 @@ pub fn init_config(lua: &Lua) -> LuaTable {
 pub fn setup<'a>(lua: &'a Lua, new_config: LuaTable) -> Result<LuaTable<'a>, LuaError> {
     let config_table: LuaTable = get_config_table(lua);
 
-    set_config(&config_table, &new_config, "dash_app_path");
-    set_config(&config_table, &new_config, "debounce");
-    set_config(&config_table, &new_config, "search_engine");
+    let dash_app_path: String = new_config
+        .get("dash_app_path")
+        .unwrap_or(config_table.get("dash_app_path").unwrap());
+    let debounce: String = new_config
+        .get("debounce")
+        .unwrap_or(config_table.get("debounce").unwrap());
+    let search_engine: String = new_config
+        .get("search_engine")
+        .unwrap_or(config_table.get("search_engine").unwrap());
+    let browsh_path: String = new_config
+        .get("browsh_path")
+        .unwrap_or(config_table.get("browsh_path").unwrap());
+
+    config_table.set("dash_app_path", dash_app_path).unwrap();
+    config_table.set("debounce", debounce).unwrap();
+    config_table.set("search_engine", search_engine).unwrap();
+    config_table.set("browsh_path", browsh_path).unwrap();
 
     if new_config.contains_key("file_type_keywords").unwrap() {
         let keywords_config_value: LuaValue = new_config.get("file_type_keywords").unwrap();

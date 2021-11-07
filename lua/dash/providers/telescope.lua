@@ -40,6 +40,27 @@ function M.dash(opts)
     on_complete = {},
   })
 
+  local previewer = nil
+  local browsh_path = require('libdash_nvim').get_browsh_path()
+  if browsh_path and #browsh_path > 0 then
+    previewer = require('telescope.previewers').new_termopen_previewer({
+      get_command = function(entry)
+        if not entry.preview_url then
+          return {}
+        end
+
+        local cmd = require('libdash_nvim').get_preview_cmd(entry.preview_url)
+        return cmd
+      end,
+      scroll_fn = function(self, direction)
+        local input = direction > 0 and '<Down>' or '<Up>'
+        local count = math.abs(direction)
+        print(input)
+        self:send_input(input)
+      end,
+    })
+  end
+
   local picker = Picker:new({
     prompt_title = require('dash.providers').build_picker_title(opts.bang or false),
     finder = finder,
@@ -47,6 +68,7 @@ function M.dash(opts)
     debounce = require('libdash_nvim').config.debounce,
     attach_mappings = attach_mappings,
     default_text = opts.initial_text or '',
+    previewer = previewer,
   })
 
   picker:find()
