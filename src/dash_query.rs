@@ -76,7 +76,7 @@ mod dash_query {
         (results, errors)
     }
 
-    fn synchronize_queries(
+    pub fn run_queries_parallel(
         cli_path: &'static str,
         queries: &'static Vec<String>,
         search_engine_fallback: &'static SearchEngine,
