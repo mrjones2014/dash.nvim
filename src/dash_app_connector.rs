@@ -1,9 +1,25 @@
 pub mod dash_app_connector {
-    use std::{process::Command, string::FromUtf8Error};
+    use std::{fmt::Display, process::Command, string::FromUtf8Error};
 
+    #[derive(Debug)]
     pub enum DashConnectorError {
         IoError(std::io::Error),
         CharsetError(FromUtf8Error),
+    }
+
+    impl Display for DashConnectorError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                DashConnectorError::IoError(e) => {
+                    write!(f, "I/O error running Dash.app CLI: {}", e)
+                }
+                DashConnectorError::CharsetError(e) => write!(
+                    f,
+                    "XML string returned from Dash.app CLI has incorrect encoding: {}",
+                    e
+                ),
+            }
+        }
     }
 
     impl From<std::io::Error> for DashConnectorError {
@@ -18,7 +34,13 @@ pub mod dash_app_connector {
         }
     }
 
-    pub async fn get_xml(cli_path: &str, query: &str) -> Result<String, DashConnectorError> {
+    /// Executes the Dash.app CLI and returns the XML-formatted output
+    ///
+    /// # Arguments
+    ///
+    /// - `cli_path` - the path to Dash.app's CLI
+    /// - `query` - the query to run
+    pub fn get_xml(cli_path: &str, query: &str) -> Result<String, DashConnectorError> {
         let raw_output = Command::new(cli_path).args(&[query]).output()?;
         let str_output = String::from_utf8(raw_output.stdout)?;
         Ok(str_output)

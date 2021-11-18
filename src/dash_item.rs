@@ -1,4 +1,4 @@
-use crate::constants::constants;
+use crate::query_builder::query_builder;
 use roxmltree::Document;
 use std::fmt::{Display, Formatter};
 
@@ -18,12 +18,12 @@ pub struct DashItem {
     pub display: String,
     pub keyword: String,
     pub query: String,
+    pub is_fallback: bool,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum DashItemCreationError {
     XmlParsingError(roxmltree::Error),
-    XmlNoItemsNode,
     XmlMissingData(String),
 }
 
@@ -33,10 +33,6 @@ impl Display for DashItemCreationError {
             DashItemCreationError::XmlParsingError(e) => {
                 write!(f, "Failed to parse XML string: {}", e)
             }
-            DashItemCreationError::XmlNoItemsNode => write!(
-                f,
-                "XML string does not have an <items> node or the <items> node is empty."
-            ),
             DashItemCreationError::XmlMissingData(value) => {
                 write!(f, "XML is missing data: {}", value)
             }
@@ -50,24 +46,6 @@ impl From<roxmltree::Error> for DashItemCreationError {
     fn from(e: roxmltree::Error) -> Self {
         DashItemCreationError::XmlParsingError(e)
     }
-}
-
-fn keyword_or_default(query: &str) -> String {
-    if !constants::KEYWORD_PATTERN.is_match(query) {
-        return String::from("");
-    }
-
-    let captures = constants::KEYWORD_PATTERN.captures(query);
-    if captures.is_none() {
-        return String::from("");
-    }
-
-    let first_capture = captures.unwrap().get(1);
-    if first_capture.is_none() {
-        return String::from("");
-    }
-
-    String::from(first_capture.unwrap().as_str())
 }
 
 impl DashItem {
@@ -86,8 +64,10 @@ impl DashItem {
         let items_node = xml_tree
             .descendants()
             .find(|node| node.tag_name().name() == "items")
-            .ok_or(DashItemCreationError::XmlNoItemsNode)?;
-        let item_keyword = keyword_or_default(query);
+            .ok_or(DashItemCreationError::XmlMissingData(String::from(
+                "<items> node",
+            )))?;
+        let item_keyword = query_builder::parse_keyword_or_default(query);
 
         let mut dash_items: Vec<DashItem> = Vec::new();
         for node in items_node.children().into_iter() {
@@ -130,6 +110,7 @@ impl DashItem {
                 display: String::from(&item_title),
                 keyword: String::from(&item_keyword),
                 query: String::from(query),
+                is_fallback: false,
             });
         }
 
