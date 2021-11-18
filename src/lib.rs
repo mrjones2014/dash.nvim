@@ -5,5 +5,6 @@ mod constants;
 mod dash_app_connector;
 mod dash_item;
 mod dash_query;
+mod lua_bindings;
 mod query_builder;
 mod search_engine;
