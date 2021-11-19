@@ -1,7 +1,8 @@
-pub mod dash_nvim_config {
+pub mod dash_config_binding {
     use crate::constants::constants;
     use mlua::prelude::{FromLua, Lua, LuaError, LuaFunction, LuaTable, LuaValue};
 
+    /// Get the instance of require('libdash_nvim').config from the Lua runtime
     pub fn get_runtime_instance(lua: &Lua) -> LuaTable {
         let require: LuaFunction = lua.globals().get("require").unwrap();
         let module: LuaTable = require.call("libdash_nvim").unwrap();
@@ -9,6 +10,7 @@ pub mod dash_nvim_config {
         return config;
     }
 
+    /// Build the default configuration table
     pub fn get_default(lua: &Lua) -> LuaTable {
         let config: LuaTable = lua
             .load(
@@ -88,6 +90,8 @@ pub mod dash_nvim_config {
         return config;
     }
 
+    /// Set the configuration by **merging** the values from the provided table
+    /// with the values from the default config table.
     pub fn setup<'a>(lua: &'a Lua, new_config: LuaTable) -> Result<LuaTable<'a>, LuaError> {
         let config_table: LuaTable = self::get_runtime_instance(lua);
 

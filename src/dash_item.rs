@@ -1,6 +1,7 @@
-use crate::query_builder::query_builder;
 use roxmltree::Document;
 use std::fmt::{Display, Formatter};
+
+use crate::query_builder::query_builder;
 
 /// Item returned from the Rust backend.
 ///

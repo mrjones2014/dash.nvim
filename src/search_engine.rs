@@ -9,6 +9,9 @@ pub enum SearchEngine {
 }
 
 impl SearchEngine {
+    /// Convert a `SearchEngine` to a `DashItem`,
+    /// using the provided query in the search engine URL,
+    /// which will be the set as the `value` field of the `DashItem`
     pub fn to_dash_item(&self, query: &str) -> DashItem {
         let keyword = query_builder::parse_keyword_or_default(&query);
         let search_engine_query_str = if keyword.len() > 0 {

@@ -1,4 +1,4 @@
-mod dash_query_binding {
+pub mod dash_query_binding {
     use crate::{
         constants::constants, dash_query::dash_query,
         lua_bindings::dash_nvim_config::dash_nvim_config, query_builder::query_builder,
@@ -72,15 +72,16 @@ mod dash_query_binding {
             .get(String::from(&buffer_type))
             .unwrap_or(LuaValue::Table(lua.create_table().unwrap()));
         let file_type_keywords =
-            get_effective_file_type_keywords(lua, &buffer_type, file_type_keywords_tbl_value)?;
+            get_effective_file_type_keywords(lua, &buffer_type, file_type_keywords_tbl_value)
+                .unwrap_or(Vec::new());
+        let queries = query_builder::build_queries(search_text, &file_type_keywords);
 
-        Ok((cli_path, file_type_keywords, search_engine))
+        Ok((cli_path, queries, search_engine))
     }
 
     pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
-        let (cli_path, queries, search_engine) = get_search_params(lua, params)?;
-        let (results, _errors) =
-            dash_query::run_queries_parallel(&cli_path, &queries, &search_engine);
+        let (cli_path, queries, search_engine) = get_search_params(lua, params.to_owned())?;
+        let (results, _errors) = dash_query::run_queries_parallel(cli_path, queries, search_engine);
 
         let results_tbl = lua.create_table()?;
         for i in 0..results.len() {
@@ -91,7 +92,7 @@ mod dash_query_binding {
             tbl.set("display", &*item.display).unwrap();
             tbl.set("keyword", &*item.keyword).unwrap();
             tbl.set("query", &*item.query).unwrap();
-            results_tbl.raw_insert(i.try_into().unwrap(), tbl);
+            results_tbl.raw_insert(i.try_into().unwrap(), tbl).unwrap();
         }
 
         Ok(results_tbl)
