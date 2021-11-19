@@ -51,7 +51,7 @@ impl SearchEngine {
             value: url,
             ordinal: String::from(&title),
             display: String::from(&title),
-            keyword: String::from(""),
+            keyword: String::from(keyword),
             query: String::from(query),
             is_fallback: true,
         }

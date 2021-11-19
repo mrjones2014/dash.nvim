@@ -94,7 +94,7 @@ If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').da
   -- map filetype strings to the keywords you've configured for docsets in Dash
   -- setting to false will disable filtering by filetype for that filetype
   -- filetypes not included in this table will not filter the query by filetype
-  -- check src/config.rs to see all defaults
+  -- check src/lua_bindings/dash_config_binding.rs to see all defaults
   -- the values you pass for file_type_keywords are merged with the defaults
   -- to disable filtering for all filetypes,
   -- set file_type_keywords = false
@@ -143,7 +143,7 @@ require('dash').setup({
 The public API consists of two main functions.
 
 ```lua
--- See src/config.rs for available config keys
+-- See src/lua_bindings/dash_config_binding.rs for available config keys
 -- Also described in configuration section below
 ---@param config
 require('dash').setup(config)
@@ -179,7 +179,7 @@ The Rust backend exports the following constants for use:
 ### `libdash_nvim.config` (table)
 
 This table stores the internal configuration. You can access it via `require('libdash_nvim').config`.
-See `src/config.rs` or [configuration](#configuration) above for configuration keys.
+See `src/lua_bindings/dash_config_binding.rs` or [configuration](#configuration) above for configuration keys.
 
 ### `libdash_nvim.default_config` (table)
 
@@ -193,7 +193,7 @@ to help with merging your custom config with the default config, but can be usef
 ### `libdash_nvim.setup` (function)
 
 This method is used to set the internal configuration of the backend. It takes a table, which will be
-**merged with the default configuration**. See `src/config.rs` or [configuration](#configuration) above
+**merged with the default configuration**. See `src/lua_bindings/dash_config_binding.rs` or [configuration](#configuration) above
 for configuration keys.
 
 ```lua
@@ -204,37 +204,44 @@ require('libdash_nvim').setup({
 
 ### `libdash_nvim.query` (function)
 
-This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
-and a boolean indicating whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
+This method takes a table as its argument. The table should have the following keys:
+
+- `search_text` - the search text entered by the user
+- `buffer_type` - the current buffer type, this will be used to determine filter keywords from config
+- `ignore_keywords` - disables filtering by keywords if true (e.g. if run with bang, `:Dash!` or `:DashWord!`)
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query(
-  'match arms',
-  'rust',
-  false
-)
+local results = libdash.query({
+  search_text = 'match arms',
+  buffer_type = 'rust',
+  ignore_keywords = false
+})
 ```
 
-The `query` method returns a table with the following properties:
+The `query` method returns a table list of tables (a Rust `Vec<DashItem>` serialized to a Lua table, see `src/dash_item.rs`)
+with the following properties:
 
-- `value` - the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
+- `value` - the number value of the item, to be used when selected
 - `ordinal` - a value to sort by, currently this is the same value as `display`
 - `display` - a display value
 - `keyword` - the keyword (if there was one) on the query that returned this result
 - `query` - the full query that returned this result
+- `is_fallback` - indicates whether the item represents a search engine fallback and should be handled as such
 
-If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`. The table will look something like the following:
+If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`.
+The table will look something like the following:
 
 ```lua
 {
-  value = 'https://duckduckgo.com/?q=array.prototype.filter',
+  value = 'https://duckduckgo.com/?q=rust match arms',
   ordinal = '1',
-  display = 'Search with DuckDuckGo: array.prototype.filter',
+  display = 'Search with DuckDuckGo: rust match arms',
+  keyword = 'rust',
+  query = 'rust:match arms',
   is_fallback = true,
 }
 ```
-
 
 ### `libdash_nvim.open_item` (function)
 
@@ -242,17 +249,24 @@ Takes an item returned from querying Dash via the `require('libdash_nvim').query
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query('match arms', 'rust', false)
+local results = libdash.query({
+  search_text = 'match arms',
+  buffer_type = 'rust',
+  ignore_keywords = false
+})
 local selected = results[1]
 require('libdash_nvim').open_item(selected)
 ```
 
-### `libdash_nvim.open_search_engine` (function)
+### `libdash_nvim.open_url` (function)
 
-Utility method to open a search engine URL when the fallback item is selected.
+Simply takes a URL string and opens it in the default browser/handler for the URL protocol. This is
+used for both opening the search engine fallback via an HTTPS URL, as well as opening the selected
+`DashItem` in Dash.app via the `dash-workflow-callback://` URL protocol.
 
 ```lua
-require('libdash_nvim').open_search_engine('https://duckduckgo.com/?q=array.prototype.filter')
+require('libdash_nvim').open_url('https://duckduckgo.com/?q=array.prototype.filter')
+require('libdash_nvim').open_url('dash-workflow-callback://5')
 ```
 
 ---
