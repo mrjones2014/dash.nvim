@@ -53,7 +53,10 @@ impl From<roxmltree::Error> for DashItemCreationError {
 impl DashItem {
     /// Create a Vec of DashItems from an XML string
     /// that contains multiple XML representations
-    /// of items.
+    /// of items. If the XML string is blank,
+    /// it will return an empty `Vec` instead
+    /// of returning an `Err`, since this is how the
+    /// Dash.app CLI responds when there are no results.
     ///
     /// # Example
     ///
@@ -62,6 +65,11 @@ impl DashItem {
     /// let dash_items: Vec<DashItem> = DashItem::try_from_xml(xml)?;
     /// ```
     pub fn try_from_xml(xml: String, query: &str) -> Result<Vec<Self>, DashItemCreationError> {
+        // This is how the CLI responds when no results
+        if xml == "" || xml == "\n" {
+            return Ok(Vec::new());
+        }
+
         let xml_tree = Document::parse(&xml)?;
         let items_node = xml_tree
             .descendants()

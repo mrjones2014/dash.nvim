@@ -15,7 +15,9 @@ impl SearchEngine {
     pub fn to_dash_item(&self, query: &str) -> DashItem {
         let keyword = query_builder::parse_keyword_or_default(&query);
         let search_engine_query_str = if keyword.len() > 0 {
-            format!("{} {}", keyword, query)
+            let str_to_replace = format!("{}:", keyword);
+            let query_without_keyword = query.replace(&str_to_replace, "");
+            format!("{} {}", keyword, query_without_keyword)
         } else {
             String::from(query)
         };
@@ -30,7 +32,11 @@ impl SearchEngine {
                 search_engine_query_str
             ),
         };
-        let title = format!("Search {} for: {}", format!("{}", self), query);
+        let title = format!(
+            "Search {} for: {}",
+            format!("{}", self),
+            search_engine_query_str
+        );
 
         DashItem {
             value: url,
