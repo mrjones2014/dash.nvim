@@ -1,14 +1,24 @@
 pub mod dash_query_binding {
     use crate::{
-        constants::constants, dash_query::dash_query,
-        lua_bindings::dash_nvim_config::dash_nvim_config, query_builder::query_builder,
+        constants::constants,
+        dash_query::dash_query::{self, QueryError},
+        lua_bindings::dash_config_binding::dash_config_binding,
+        query_builder::query_builder,
         search_engine::SearchEngine,
+        url_handler::url_handler,
     };
     use mlua::{
         prelude::{Lua, LuaError, LuaResult, LuaString, LuaTable, LuaValue},
         FromLua,
     };
+    use std::os::raw::c_double;
     use std::{convert::TryInto, str::FromStr};
+
+    impl From<QueryError> for LuaError {
+        fn from(e: QueryError) -> Self {
+            LuaError::RuntimeError(format!("{}", e))
+        }
+    }
 
     fn get_effective_file_type_keywords(
         lua: &Lua,
@@ -57,7 +67,7 @@ pub mod dash_query_binding {
             return Ok((String::from(""), Vec::new(), SearchEngine::DDG));
         }
 
-        let config = dash_nvim_config::get_runtime_instance(lua);
+        let config = dash_config_binding::get_runtime_instance(lua);
         let dash_app_path = config
             .get("dash_app_path")
             .unwrap_or(String::from(constants::DASH_APP_BASE_PATH));
@@ -96,5 +106,19 @@ pub mod dash_query_binding {
         }
 
         Ok(results_tbl)
+    }
+
+    pub fn open_item(lua: &Lua, item: LuaTable) -> LuaResult<()> {
+        let query_str: String = item.get("query").unwrap();
+        let id: c_double = item.get("value").unwrap();
+        let config = dash_config_binding::get_runtime_instance(lua);
+        let dash_app_path = config
+            .get("dash_app_path")
+            .unwrap_or(String::from(constants::DASH_APP_BASE_PATH));
+        let cli_path = format!("{}{}", dash_app_path, constants::DASH_APP_CLI_PATH);
+        let query = item.get("query").unwrap_or(String::from(""));
+        let results = dash_query::run_query_sync(&cli_path, &query)?;
+        url_handler::open_url(format!("{}{}", constants::DASH_CALLBACK_PROTO, id));
+        Ok(())
     }
 }

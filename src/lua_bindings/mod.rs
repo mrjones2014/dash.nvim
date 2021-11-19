@@ -23,4 +23,8 @@ pub mod dash_lua_bindings {
     pub fn create_open_url_function(lua: &Lua) -> LuaResult<LuaFunction> {
         Ok(lua.create_function(url_handler_binding::open_url)?)
     }
+
+    pub fn create_open_item_function(lua: &Lua) -> LuaResult<LuaFunction> {
+        Ok(lua.create_function(dash_query_binding::open_item)?)
+    }
 }

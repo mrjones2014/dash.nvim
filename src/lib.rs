@@ -23,6 +23,14 @@ pub fn libdash_nvim(lua: &Lua) -> LuaResult<LuaTable> {
     exports.set("query", dash_lua_bindings::create_query_function(lua)?)?;
     exports.set("setup", dash_lua_bindings::create_setup_function(lua)?)?;
     exports.set(
+        "open_url",
+        dash_lua_bindings::create_open_url_function(lua)?,
+    )?;
+    exports.set(
+        "open_item",
+        dash_lua_bindings::create_open_item_function(lua)?,
+    )?;
+    exports.set(
         "DASH_APP_BASE_PATH",
         constants::constants::DASH_APP_BASE_PATH,
     )?;
