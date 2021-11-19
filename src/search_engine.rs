@@ -43,6 +43,8 @@ impl SearchEngine {
 impl FromStr for SearchEngine {
     type Err = ();
 
+    /// Convert a string to SearchEngine enum. Will not panic,
+    /// instead will default to SearchEngine::DDG
     fn from_str(input: &str) -> Result<SearchEngine, Self::Err> {
         match input.to_lowercase().as_str() {
             "duckduckgo" => Ok(SearchEngine::DDG),
