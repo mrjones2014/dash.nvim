@@ -51,7 +51,11 @@ M.dash = function(opts)
       return {}
     end
 
-    cached_results = require('libdash_nvim').query(query, current_file_type, opts.bang or false)
+    cached_results = require('libdash_nvim').query({
+      search_text = query,
+      buffer_type = current_file_type,
+      ignore_keywords = opts.bang or false,
+    })
     local items = {}
     for _, item in pairs(cached_results) do
       table.insert(items, item.display)

@@ -13,7 +13,11 @@ local function build_producer(current_file_type, bang)
       print('wtf')
       coroutine.yield(nil)
     elseif request.filter and #request.filter > 0 then
-      local results = require('libdash_nvim').query(request.filter, current_file_type, bang or false)
+      local results = require('libdash_nvim').query({
+        search_text = request.filter,
+        buffer_type = current_file_type,
+        ignore_keywords = bang or false,
+      })
       yield_results(results)
     else
       coroutine.yield({})
