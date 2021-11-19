@@ -86,7 +86,7 @@ fn get_search_params(
         get_effective_file_type_keywords(lua, &buffer_type, file_type_keywords_tbl_value)
             .unwrap_or(Vec::new());
     let queries = if ignore_keywords {
-        Vec::new()
+        vec![search_text]
     } else {
         query_builder::build_queries(search_text, &file_type_keywords)
     };
