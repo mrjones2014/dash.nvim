@@ -1,4 +1,4 @@
-mod dash_query {
+pub mod dash_query {
     use std::fmt::Display;
 
     use crossbeam::channel;
