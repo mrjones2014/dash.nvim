@@ -19,6 +19,8 @@ pub fn build_queries(search_text: String, configured_keywords: &Vec<String>) -> 
         .collect()
 }
 
+/// Given a query in the form `keyword:rest of query`, parse the keyword out of it.
+/// If no keyword is present, returns an empty string.
 pub fn parse_keyword_or_default(query: &str) -> String {
     if !constants::KEYWORD_PATTERN.is_match(query) {
         return String::from("");

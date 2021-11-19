@@ -8,6 +8,15 @@ use futures::future;
 use std::fmt::Display;
 use tokio::runtime::Runtime;
 
+/// Describes the set of errors that can occur
+/// when running Dash queries.
+///
+/// `QueryError::DashConnectorError` indicates that something
+/// went wrong when interacting with Dash.app.
+///
+/// `QueryError::ItemCreation` indicates that something
+/// went wrong when creating `DashItem`s from the XML
+/// string returned by the Dash.app CLI.
 #[derive(Debug)]
 pub enum QueryError {
     DashConnectorError(DashConnectorError),
@@ -73,7 +82,17 @@ async fn run_queries_async(
     (results, errors)
 }
 
-/// Run a single query, with search engine fallback.
+/// Run a single query, with search engine fallback. This
+/// method does not handle search engine fallback,
+/// because it is not intended to be used directly. It is
+/// called internally by `dash_query_binding::open_item`
+/// and is expected to always be given a query which is
+/// known to return at least one result.
+///
+/// # Arguments
+///
+/// - `cli_path` - the path to Dash.app's CLI to run the queries with
+/// - `query` - the query to run
 pub fn run_query_sync(cli_path: &str, query: &str) -> Result<Vec<DashItem>, QueryError> {
     let xml_result = dash_app_connector::get_xml(cli_path, &query)?;
     Ok(DashItem::try_from_xml(xml_result, &query)?)
