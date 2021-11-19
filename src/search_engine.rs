@@ -2,6 +2,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{dash_item::DashItem, query_builder};
 
+#[derive(Debug, PartialEq)]
 pub enum SearchEngine {
     DDG,
     STARTPAGE,
@@ -56,10 +57,9 @@ impl FromStr for SearchEngine {
     /// instead will default to SearchEngine::DDG
     fn from_str(input: &str) -> Result<SearchEngine, Self::Err> {
         match input.to_lowercase().as_str() {
-            "duckduckgo" => Ok(SearchEngine::DDG),
-            "ddg" => Ok(SearchEngine::DDG),
             "startpage" => Ok(SearchEngine::STARTPAGE),
             "google" => Ok(SearchEngine::GOOGLE),
+            // DDG by default
             _ => Ok(SearchEngine::DDG),
         }
     }
@@ -72,5 +72,60 @@ impl Display for SearchEngine {
             SearchEngine::STARTPAGE => write!(f, "StartPage"),
             SearchEngine::GOOGLE => write!(f, "Google"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use super::*;
+
+    #[test]
+    fn from_str_when_no_match_defaults_to_ddg() {
+        let search_engine = "no match".parse::<SearchEngine>().unwrap();
+        assert_eq!(SearchEngine::DDG, search_engine);
+    }
+
+    #[test]
+    fn from_str_is_not_case_sensitive() {
+        // pairs of (input, expected_result)
+        let test_data = HashMap::from([
+            ("google", SearchEngine::GOOGLE),
+            ("GOOGLE", SearchEngine::GOOGLE),
+            ("gOoGLe", SearchEngine::GOOGLE),
+            ("startpage", SearchEngine::STARTPAGE),
+            ("STARTPAGE", SearchEngine::STARTPAGE),
+            ("StArTpAgE", SearchEngine::STARTPAGE),
+            ("ddg", SearchEngine::DDG),
+            ("duckduckgo", SearchEngine::DDG),
+            ("DDG", SearchEngine::DDG),
+            ("DUCKDUCKGO", SearchEngine::DDG),
+            ("DdG", SearchEngine::DDG),
+            ("DuCkDuCkGo", SearchEngine::DDG),
+        ]);
+
+        for (input, expected_result) in test_data.iter() {
+            assert_eq!(expected_result, &input.parse::<SearchEngine>().unwrap());
+        }
+    }
+
+    #[test]
+    fn to_dash_item_replaces_keyword_colon_with_keyword_space() {
+        let query = "rust:match arms";
+        let dash_item = SearchEngine::DDG.to_dash_item(query);
+        assert!(dash_item.value.ends_with("=rust match arms"));
+    }
+
+    #[test]
+    fn to_dash_item_appends_query_unchanged_when_no_keyword() {
+        let query = "match arms";
+        let dash_item = SearchEngine::DDG.to_dash_item(query);
+        assert!(dash_item.value.ends_with("=match arms"));
+    }
+
+    #[test]
+    fn to_dash_item_sets_is_fallback_true() {
+        assert!(SearchEngine::DDG.to_dash_item("test").is_fallback);
     }
 }
