@@ -35,7 +35,7 @@ impl From<FromUtf8Error> for DashConnectorError {
 
 /// Executes the Dash.app CLI and returns the XML-formatted output
 ///
-/// # Arguments
+/// ## Arguments
 ///
 /// - `cli_path` - the path to Dash.app's CLI
 /// - `query` - the query to run
