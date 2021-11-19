@@ -1,3 +1,4 @@
+use crate::lua_bindings::nvim;
 use crate::{
     constants,
     dash_query::{self, QueryError},
@@ -77,20 +78,31 @@ fn get_search_params(
         .get("file_type_keywords")
         .unwrap_or(lua.create_table().unwrap());
     let buffer_type = params.get("buffer_type").unwrap_or(String::from("No Name"));
+    let ignore_keywords = params.get("ignore_keywords").unwrap_or(false);
     let file_type_keywords_tbl_value: LuaValue = file_type_keywords_tbl
         .get(String::from(&buffer_type))
         .unwrap_or(LuaValue::Table(lua.create_table().unwrap()));
     let file_type_keywords =
         get_effective_file_type_keywords(lua, &buffer_type, file_type_keywords_tbl_value)
             .unwrap_or(Vec::new());
-    let queries = query_builder::build_queries(search_text, &file_type_keywords);
+    let queries = if ignore_keywords {
+        Vec::new()
+    } else {
+        query_builder::build_queries(search_text, &file_type_keywords)
+    };
 
     Ok((cli_path, queries, search_engine))
 }
 
 pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
     let (cli_path, queries, search_engine) = get_search_params(lua, params.to_owned())?;
-    let (results, _errors) = dash_query::run_queries_parallel(cli_path, queries, search_engine);
+    let (results, errors) = dash_query::run_queries_parallel(cli_path, queries, search_engine);
+
+    if errors.len() > 0 {
+        // don't fail the whole query method on the off chance
+        // that nvim::report_errors returns an error, just ignore it
+        let _ = nvim::report_errors(lua, &errors);
+    }
 
     let results_tbl = lua.create_table()?;
     for i in 0..results.len() {
@@ -101,7 +113,10 @@ pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
         tbl.set("display", &*item.display).unwrap();
         tbl.set("keyword", &*item.keyword).unwrap();
         tbl.set("query", &*item.query).unwrap();
-        results_tbl.raw_insert(i.try_into().unwrap(), tbl).unwrap();
+        // Lua tables are indexed from 1, not 0
+        results_tbl
+            .raw_insert((i + 1).try_into().unwrap(), tbl)
+            .unwrap();
     }
 
     Ok(results_tbl)

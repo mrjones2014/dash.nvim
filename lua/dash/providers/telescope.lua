@@ -6,7 +6,11 @@ local function finder_fn(current_file_type, bang)
       return {}
     end
 
-    return require('libdash_nvim').query(prompt, current_file_type, bang)
+    return require('libdash_nvim').query({
+      search_text = prompt,
+      buffer_type = current_file_type,
+      ignore_keywords = bang,
+    })
   end
 end
 

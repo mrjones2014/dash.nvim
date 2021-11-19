@@ -1,5 +1,6 @@
 pub mod dash_config_binding;
 pub mod dash_query_binding;
+pub mod nvim;
 pub mod url_handler_binding;
 
 pub mod dash_lua_bindings {
