@@ -113,6 +113,7 @@ pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
         tbl.set("display", &*item.display).unwrap();
         tbl.set("keyword", &*item.keyword).unwrap();
         tbl.set("query", &*item.query).unwrap();
+        tbl.set("is_fallback", item.is_fallback).unwrap();
         // Lua tables are indexed from 1, not 0
         results_tbl
             .raw_insert((i + 1).try_into().unwrap(), tbl)
@@ -123,7 +124,12 @@ pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
 }
 
 pub fn open_item(lua: &Lua, item: LuaTable) -> LuaResult<()> {
-    let id: c_double = item.get("value").unwrap();
+    let id: c_double = item.get("value").unwrap_or(-1.0);
+    if id < 0.0 {
+        // No item was actually selected
+        return Ok(());
+    }
+
     let config = dash_config_binding::get_runtime_instance(lua);
     let dash_app_path = config
         .get("dash_app_path")
