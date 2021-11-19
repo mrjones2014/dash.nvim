@@ -76,16 +76,24 @@ pub mod dash_query {
         (results, errors)
     }
 
+    /// Run a list of queries in parallel, with a search engine fallback
+    ///
+    /// # Arguments
+    ///
+    /// - `cli_path` - the path to Dash.app's CLI to run the queries with
+    /// - `queries` - the list of queries to run
+    /// - `search_engine_fallback` - the search engine that should be used when no results are found
     pub fn run_queries_parallel(
-        cli_path: &'static str,
-        queries: &'static Vec<String>,
-        search_engine_fallback: &'static SearchEngine,
+        cli_path: String,
+        queries: Vec<String>,
+        search_engine_fallback: SearchEngine,
     ) -> (Vec<DashItem>, Vec<String>) {
         let (tx, rx) = channel::bounded(1);
         let runtime = Runtime::new().unwrap();
         let handle = runtime.handle();
         handle.spawn(async move {
-            let result_table = &run_queries_async(cli_path, queries, search_engine_fallback).await;
+            let result_table =
+                &run_queries_async(&cli_path, &queries, &search_engine_fallback).await;
             let _ = tx.send(result_table.clone());
         });
 
