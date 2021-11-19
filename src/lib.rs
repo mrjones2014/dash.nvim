@@ -31,10 +31,7 @@ pub fn libdash_nvim(lua: &Lua) -> LuaResult<LuaTable> {
         "open_item",
         dash_lua_bindings::create_open_item_function(lua)?,
     )?;
-    exports.set(
-        "DASH_APP_BASE_PATH",
-        constants::constants::DASH_APP_BASE_PATH,
-    )?;
-    exports.set("DASH_APP_CLI_PATH", constants::constants::DASH_APP_CLI_PATH)?;
+    exports.set("DASH_APP_BASE_PATH", constants::DASH_APP_BASE_PATH)?;
+    exports.set("DASH_APP_CLI_PATH", constants::DASH_APP_CLI_PATH)?;
     Ok(exports)
 }

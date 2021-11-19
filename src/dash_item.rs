@@ -1,17 +1,18 @@
 use roxmltree::Document;
 use std::fmt::{Display, Formatter};
 
-use crate::query_builder::query_builder;
+use crate::query_builder;
 
 /// Item returned from the Rust backend.
 ///
 /// # Fields
 ///
-/// - `value` -- the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
-/// - `ordinal` -- a value to sort by, currently this is the same value as `display`
-/// - `display` -- a display value
-/// - `keyword` -- the keyword (if there was one) on the query that returned this result
-/// - `query` -- the full query that returned this result
+/// - `value` - the number value of the item, to be used when selected
+/// - `ordinal` - a value to sort by, currently this is the same value as `display`
+/// - `display` - a display value
+/// - `keyword` - the keyword (if there was one) on the query that returned this result
+/// - `query` - the full query that returned this result
+/// - `is_fallback` - indicates whether the item represents a search engine fallback and should be handled as such
 #[derive(Clone, Debug, PartialEq)]
 pub struct DashItem {
     pub value: String,
@@ -119,6 +120,7 @@ impl DashItem {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 

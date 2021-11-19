@@ -22,7 +22,12 @@ local function build_producer(current_file_type, bang)
 end
 
 local function handle_selected(selected)
-  require('libdash_nvim').open_item(selected)
+  local libdash = require('libdash_nvim')
+  if selected.is_fallback then
+    libdash.open_url(selected.value)
+  else
+    libdash.open_item(selected)
+  end
 end
 
 function M.dash(bang)

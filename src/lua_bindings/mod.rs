@@ -3,9 +3,9 @@ pub mod dash_query_binding;
 pub mod url_handler_binding;
 
 pub mod dash_lua_bindings {
-    use crate::lua_bindings::dash_config_binding::dash_config_binding;
-    use crate::lua_bindings::dash_query_binding::dash_query_binding;
-    use crate::lua_bindings::url_handler_binding::url_handler_binding;
+    use crate::lua_bindings::dash_config_binding;
+    use crate::lua_bindings::dash_query_binding;
+    use crate::lua_bindings::url_handler_binding;
     use mlua::prelude::{Lua, LuaFunction, LuaResult, LuaTable};
 
     pub fn create_config_table(lua: &Lua) -> LuaResult<LuaTable> {

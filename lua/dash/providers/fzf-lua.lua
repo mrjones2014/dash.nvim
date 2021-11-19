@@ -16,7 +16,7 @@ local function handle_selected(selected)
   local selected_item = matching_items[1]
   local libdash = require('libdash_nvim')
   if selected_item.is_fallback then
-    libdash.open_search_engine(selected_item.value)
+    libdash.open_url(selected_item.value)
   else
     libdash.open_item(selected_item)
   end

@@ -21,7 +21,7 @@ local function attach_mappings(_, map)
     if not entry.is_fallback then
       libdash.open_item(entry)
     else
-      libdash.open_search_engine(entry.value)
+      libdash.open_url(entry.value)
     end
     require('telescope.actions').close(buffnr)
   end)
