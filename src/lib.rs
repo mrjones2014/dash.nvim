@@ -13,6 +13,7 @@ mod url_handler;
 use crate::lua_bindings::dash_lua_bindings;
 use mlua::prelude::{Lua, LuaResult, LuaTable};
 
+#[mlua::lua_module]
 pub fn libdash_nvim(lua: &Lua) -> LuaResult<LuaTable> {
     let exports = lua.create_table()?;
     exports.set("config", dash_lua_bindings::create_config_table(lua)?)?;
