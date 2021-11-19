@@ -15,7 +15,7 @@ use mlua::prelude::{Lua, LuaResult, LuaTable};
 
 /// This creates the Lua module that is exported as `libdash_nvim`.
 ///
-/// ## Module Table Fields
+/// # Module Table Fields
 ///
 /// - `config` - the current configuration table, see `src/lua_bindings/dash_config_binding.rs`
 /// - `default_config` - a copy of the config table with the default values, this should be treated as read-only

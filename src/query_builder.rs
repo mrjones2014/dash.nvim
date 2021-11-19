@@ -4,7 +4,7 @@ use crate::constants;
 /// return the list of queries that should be run via the Dash.app CLI, with keywords
 /// prepended to the search text
 ///
-/// ## Arguments
+/// # Arguments
 ///
 /// - `search_text` - the search text typed by the user, to be used as the query
 /// - `configured_keywords` - the configured keywords for the current buffer type
