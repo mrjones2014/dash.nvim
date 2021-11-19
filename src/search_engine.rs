@@ -2,6 +2,14 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{dash_item::DashItem, query_builder};
 
+/// Defines supported search engine fallbacks.
+/// Currently supported are:
+///
+/// - DuckDuckGo
+/// - StartPage
+/// - Google
+///
+/// Falls back to DuckDuckGo if no or an invalid value is configured.
 #[derive(Debug, PartialEq)]
 pub enum SearchEngine {
     DDG,

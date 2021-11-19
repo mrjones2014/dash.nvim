@@ -22,6 +22,8 @@ pub struct DashItem {
     pub is_fallback: bool,
 }
 
+/// Describes errors that can happen while creating `DashItem`s
+/// from XML strings.
 #[derive(Debug, PartialEq)]
 pub enum DashItemCreationError {
     XmlParsingError(roxmltree::Error),

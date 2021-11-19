@@ -1,14 +1,14 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod constants;
-mod dash_app_connector;
-mod dash_item;
-mod dash_query;
-mod lua_bindings;
-mod query_builder;
-mod search_engine;
-mod url_handler;
+pub mod constants;
+pub mod dash_app_connector;
+pub mod dash_item;
+pub mod dash_query;
+pub mod lua_bindings;
+pub mod query_builder;
+pub mod search_engine;
+pub mod url_handler;
 
 use crate::lua_bindings::dash_lua_bindings;
 use mlua::prelude::{Lua, LuaResult, LuaTable};

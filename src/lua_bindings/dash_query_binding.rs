@@ -94,6 +94,14 @@ fn get_search_params(
     Ok((cli_path, queries, search_engine))
 }
 
+/// Lua binding to `dash_query::run_queries_parallel`.
+///
+/// Creates a Lua function which takes a table as its only parameter. The
+/// table needs the following keys:
+///
+/// - `search_text` - the search text entered by the user
+/// - `buffer_type` - the current buffer type, this will be used to determine filter keywords from config
+/// - `ignore_keywords` - disables filtering by keywords if true
 pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
     let (cli_path, queries, search_engine) = get_search_params(lua, params.to_owned())?;
     let (results, errors) = dash_query::run_queries_parallel(cli_path, queries, search_engine);
@@ -123,6 +131,9 @@ pub fn query<'a>(lua: &'a Lua, params: LuaTable) -> LuaResult<LuaTable<'a>> {
     Ok(results_tbl)
 }
 
+/// Creates a Lua function to open a `DashItem` in Dash.app
+/// once selected. The Lua function accepts a single `DashItem`
+/// as its parameter and opens it in Dash.app.
 pub fn open_item(lua: &Lua, item: LuaTable) -> LuaResult<()> {
     let id: c_double = item.get("value").unwrap_or(-1.0);
     if id < 0.0 {

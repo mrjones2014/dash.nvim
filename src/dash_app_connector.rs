@@ -1,5 +1,10 @@
 use std::{fmt::Display, process::Command, string::FromUtf8Error};
 
+/// Describes errors that can occur when interacting with Dash.app.
+/// `DashConnectorError::IoError` can occur if the app path is configured
+/// incorrectly, etc. `DashConnectorError::CharsetError` can happen
+/// if for some reason the Dash.app CLI returns a string that is not
+/// UTF-8 encoded.
 #[derive(Debug)]
 pub enum DashConnectorError {
     IoError(std::io::Error),
