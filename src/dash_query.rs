@@ -12,7 +12,7 @@ pub mod dash_query {
     };
 
     #[derive(Debug)]
-    enum QueryError {
+    pub enum QueryError {
         DashConnectorError(DashConnectorError),
         ItemCreation(DashItemCreationError),
     }
@@ -45,6 +45,11 @@ pub mod dash_query {
     }
 
     async fn run_query_async(cli_path: &str, query: &str) -> Result<Vec<DashItem>, QueryError> {
+        let xml_result = dash_app_connector::get_xml(cli_path, &query)?;
+        Ok(DashItem::try_from_xml(xml_result, &query)?)
+    }
+
+    pub fn run_query_sync(cli_path: &str, query: &str) -> Result<Vec<DashItem>, QueryError> {
         let xml_result = dash_app_connector::get_xml(cli_path, &query)?;
         Ok(DashItem::try_from_xml(xml_result, &query)?)
     }
