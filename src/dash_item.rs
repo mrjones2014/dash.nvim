@@ -5,7 +5,7 @@ use crate::query_builder;
 
 /// Item returned from the Rust backend.
 ///
-/// # Fields
+/// ## Fields
 ///
 /// - `value` - the number value of the item, to be used when selected
 /// - `ordinal` - a value to sort by, currently this is the same value as `display`
@@ -58,7 +58,7 @@ impl DashItem {
     /// of returning an `Err`, since this is how the
     /// Dash.app CLI responds when there are no results.
     ///
-    /// # Example
+    /// ## Example
     ///
     /// ```
     /// let xml = dash_app_connector::get_xml(&cli_path, &query)?;

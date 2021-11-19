@@ -81,7 +81,7 @@ pub fn run_query_sync(cli_path: &str, query: &str) -> Result<Vec<DashItem>, Quer
 
 /// Run a list of queries in parallel, with a search engine fallback
 ///
-/// # Arguments
+/// ## Arguments
 ///
 /// - `cli_path` - the path to Dash.app's CLI to run the queries with
 /// - `queries` - the list of queries to run

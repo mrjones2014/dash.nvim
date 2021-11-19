@@ -218,11 +218,11 @@ local results = libdash.query(
 
 The `query` method returns a table with the following properties:
 
-- `value` -- the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
-- `ordinal` -- a value to sort by, currently this is the same value as `display`
-- `display` -- a display value
-- `keyword` -- the keyword (if there was one) on the query that returned this result
-- `query` -- the full query that returned this result
+- `value` - the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
+- `ordinal` - a value to sort by, currently this is the same value as `display`
+- `display` - a display value
+- `keyword` - the keyword (if there was one) on the query that returned this result
+- `query` - the full query that returned this result
 
 If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`. The table will look something like the following:
 
