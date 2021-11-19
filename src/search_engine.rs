@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-use crate::{dash_item::DashItem, query_builder::query_builder};
+use crate::{dash_item::DashItem, query_builder};
 
 pub enum SearchEngine {
     DDG,
