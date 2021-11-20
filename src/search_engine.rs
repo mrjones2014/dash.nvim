@@ -22,8 +22,8 @@ impl SearchEngine {
     /// using the provided query in the search engine URL,
     /// which will be the set as the `value` field of the `DashItem`
     pub fn to_dash_item(&self, query: &str) -> DashItem {
-        let keyword = query_builder::parse_keyword_or_default(&query);
-        let search_engine_query_str = if keyword.len() > 0 {
+        let keyword = query_builder::parse_keyword_or_default(query);
+        let search_engine_query_str = if !keyword.is_empty() {
             let str_to_replace = format!("{}:", keyword);
             let query_without_keyword = query.replace(&str_to_replace, "");
             format!("{} {}", keyword, query_without_keyword)
@@ -51,7 +51,7 @@ impl SearchEngine {
             value: url,
             ordinal: String::from(&title),
             display: String::from(&title),
-            keyword: String::from(keyword),
+            keyword,
             query: String::from(query),
             is_fallback: true,
         }

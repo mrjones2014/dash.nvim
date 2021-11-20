@@ -17,23 +17,23 @@ pub mod dash_lua_bindings {
 
     /// Creates a Lua function `setup(config)` to set the module configuration.
     pub fn create_setup_function(lua: &Lua) -> LuaResult<LuaFunction> {
-        Ok(lua.create_function(dash_config_binding::setup)?)
+        lua.create_function(dash_config_binding::setup)
     }
 
     /// Creates a Lua function `query(params)` to run the specified queries.
     pub fn create_query_function(lua: &Lua) -> LuaResult<LuaFunction> {
-        Ok(lua.create_function(dash_query_binding::query)?)
+        lua.create_function(dash_query_binding::query)
     }
 
     /// Creates a Lua function `open_url(url)` to open URLs. This is used
     /// for the search engine fallback.
     pub fn create_open_url_function(lua: &Lua) -> LuaResult<LuaFunction> {
-        Ok(lua.create_function(url_handler_binding::open_url)?)
+        lua.create_function(url_handler_binding::open_url)
     }
 
     /// Creates a Lua function `open_item(selected_item)` to open the selected `DashItem`
     /// in Dash.app.
     pub fn create_open_item_function(lua: &Lua) -> LuaResult<LuaFunction> {
-        Ok(lua.create_function(dash_query_binding::open_item)?)
+        lua.create_function(dash_query_binding::open_item)
     }
 }

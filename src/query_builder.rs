@@ -8,13 +8,13 @@ use crate::constants;
 ///
 /// - `search_text` - the search text typed by the user, to be used as the query
 /// - `configured_keywords` - the configured keywords for the current buffer type
-pub fn build_queries(search_text: String, configured_keywords: &Vec<String>) -> Vec<String> {
-    if configured_keywords.len() == 0 {
+pub fn build_queries(search_text: String, configured_keywords: &[String]) -> Vec<String> {
+    if configured_keywords.is_empty() {
         return vec![search_text];
     }
 
     configured_keywords
-        .into_iter()
+        .iter()
         .map(|keyword| format!("{}:{}", keyword, search_text))
         .collect()
 }

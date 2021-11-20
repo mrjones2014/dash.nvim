@@ -6,7 +6,7 @@ pub fn get_runtime_instance(lua: &Lua) -> LuaTable {
     let require: LuaFunction = lua.globals().get("require").unwrap();
     let module: LuaTable = require.call("libdash_nvim").unwrap();
     let config: LuaTable = module.get("config").unwrap();
-    return config;
+    config
 }
 
 /// Build the default configuration table
@@ -86,7 +86,7 @@ pub fn get_default(lua: &Lua) -> LuaTable {
         )
         .eval()
         .unwrap();
-    return config;
+    config
 }
 
 /// Set the configuration by **merging** the values from the provided table
@@ -96,13 +96,13 @@ pub fn setup<'a>(lua: &'a Lua, new_config: LuaTable) -> Result<LuaTable<'a>, Lua
 
     let dash_app_path: String = new_config
         .get("dash_app_path")
-        .unwrap_or(config_table.get("dash_app_path").unwrap());
+        .unwrap_or_else(|_| config_table.get("dash_app_path").unwrap());
     let debounce: String = new_config
         .get("debounce")
-        .unwrap_or(config_table.get("debounce").unwrap());
+        .unwrap_or_else(|_| config_table.get("debounce").unwrap());
     let search_engine: String = new_config
         .get("search_engine")
-        .unwrap_or(config_table.get("search_engine").unwrap());
+        .unwrap_or_else(|_| config_table.get("search_engine").unwrap());
 
     config_table.set("dash_app_path", dash_app_path).unwrap();
     config_table.set("debounce", debounce).unwrap();
@@ -127,15 +127,15 @@ pub fn setup<'a>(lua: &'a Lua, new_config: LuaTable) -> Result<LuaTable<'a>, Lua
                 let keyword_key = unwrapped.0;
                 let keyword_value: LuaValue = unwrapped.1;
                 keywords_config_table
-                    .set(keyword_key.to_string(), keyword_value)
+                    .set(keyword_key, keyword_value)
                     .unwrap();
-                config_table
-                    .set("file_type_keywords", keywords_config_table)
-                    .unwrap();
-                return Ok(config_table);
             }
+
+            config_table
+                .set("file_type_keywords", keywords_config_table)
+                .unwrap();
         }
     }
 
-    return Ok(config_table);
+    Ok(config_table)
 }
