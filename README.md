@@ -77,7 +77,9 @@ plugins installed will result in undefined behavior. You can use a specific fuzz
 
 If using Telescope, you can also run `:Telescope dash search` or `:Telescope dash search_no_filter`.
 
-If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`, for example.
+If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`.
+
+If using Snap, you can also run `:lua require('dash.providers.snap').dash({ bang = false, initial_text = '' })`.
 
 ## Configuration
 
