@@ -13,11 +13,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Install Neovim
-      uses: rhysd/action-setup-vim@v1
-      with:
-        neovim: true
-        version: v0.5.1
     - name: Setup 'lua'
       uses: leafo/gh-actions-lua@v8
       with:
@@ -50,6 +45,11 @@ jobs:
     name: Run Lua Integration Tests
     runs-on: macos-11
     steps:
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.5.1
       - name: Checkout
         uses: actions/checkout@v2
       - name: Run All Tests
