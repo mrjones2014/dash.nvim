@@ -28,6 +28,10 @@ dev:
 clean:
 	@cargo clean
 
+.PHONY: lint-rust
+lint-rust:
+	cargo clippy -- -D warnings
+
 .PHONY: build-macos-arm
 build-macos-arm:
 	@cargo build --release --target aarch64-apple-darwin
@@ -43,6 +47,7 @@ build-macos-x86:
 	@mkdir -p ./bin/x86/deps/
 	@cp ./target/x86_64-apple-darwin/release/libdash_nvim.dylib ./bin/x86/libdash_nvim.so
 	@cp ./target/x86_64-apple-darwin/release/deps/*.rlib ./bin/x86/deps/
+
 
 .PHONY: build
 build: build-macos-arm
