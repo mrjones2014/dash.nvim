@@ -55,9 +55,10 @@ async fn run_query_async(cli_path: &str, query: &str) -> Result<Vec<DashItem>, Q
     self::run_query_sync(cli_path, query)
 }
 
+/// Returns a tuple of (results, errors)
 async fn run_queries_async(
     cli_path: &str,
-    queries: &Vec<String>,
+    queries: &[String],
     search_engine_fallback: &SearchEngine,
 ) -> (Vec<DashItem>, Vec<String>) {
     let mut results: Vec<DashItem> = Vec::new();
@@ -74,9 +75,9 @@ async fn run_queries_async(
             Err(e) => errors.push(format!("{}", e)),
         });
 
-    if results.len() == 0 {
-        let query = if queries.len() > 0 { &queries[0] } else { "" };
-        results.push(search_engine_fallback.to_dash_item(&query));
+    if results.is_empty() {
+        let query = if !queries.is_empty() { &queries[0] } else { "" };
+        results.push(search_engine_fallback.to_dash_item(query));
     }
 
     (results, errors)
@@ -94,8 +95,8 @@ async fn run_queries_async(
 /// - `cli_path` - the path to Dash.app's CLI to run the queries with
 /// - `query` - the query to run
 pub fn run_query_sync(cli_path: &str, query: &str) -> Result<Vec<DashItem>, QueryError> {
-    let xml_result = dash_app_connector::get_xml(cli_path, &query)?;
-    Ok(DashItem::try_from_xml(xml_result, &query)?)
+    let xml_result = dash_app_connector::get_xml(cli_path, query)?;
+    Ok(DashItem::try_from_xml(xml_result, query)?)
 }
 
 /// Run a list of queries in parallel, with a search engine fallback
@@ -111,7 +112,7 @@ pub fn run_queries_parallel(
     search_engine_fallback: SearchEngine,
 ) -> (Vec<DashItem>, Vec<String>) {
     // if empty, just return empty results
-    if queries.len() == 0 {
+    if queries.is_empty() {
         return (Vec::new(), Vec::new());
     }
 
@@ -120,12 +121,9 @@ pub fn run_queries_parallel(
         let result = run_query_sync(&cli_path, &queries[0]);
         if result.is_ok() {
             let result_items = result.as_ref().unwrap();
-            if result_items.len() == 0 {
-                let query = if queries.len() > 0 { &queries[0] } else { "" };
-                return (
-                    vec![search_engine_fallback.to_dash_item(&query)],
-                    Vec::new(),
-                );
+            if result_items.is_empty() {
+                let query = if !queries.is_empty() { &queries[0] } else { "" };
+                return (vec![search_engine_fallback.to_dash_item(query)], Vec::new());
             }
 
             return (result_items.to_owned(), Vec::new());
@@ -142,5 +140,5 @@ pub fn run_queries_parallel(
         let _ = tx.send(result_table.clone());
     });
 
-    return rx.recv().unwrap().to_owned();
+    rx.recv().unwrap()
 }

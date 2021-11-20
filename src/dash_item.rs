@@ -67,7 +67,7 @@ impl DashItem {
     /// ```
     pub fn try_from_xml(xml: String, query: &str) -> Result<Vec<Self>, DashItemCreationError> {
         // This is how the CLI responds when no results
-        if xml == "" || xml == "\n" {
+        if xml.is_empty() || xml == "\n" {
             return Ok(Vec::new());
         }
 
@@ -75,23 +75,19 @@ impl DashItem {
         let items_node = xml_tree
             .descendants()
             .find(|node| node.tag_name().name() == "items")
-            .ok_or(DashItemCreationError::XmlMissingData(String::from(
-                "<items> node",
-            )))?;
+            .ok_or_else(|| DashItemCreationError::XmlMissingData(String::from("<items> node")))?;
         let item_keyword = query_builder::parse_keyword_or_default(query);
 
         let mut dash_items: Vec<DashItem> = Vec::new();
         for node in items_node.children().into_iter() {
             let relevant_tags = node.children().filter(|child| {
                 let tag_name = child.tag_name().name();
-                return tag_name == "text" || tag_name == "title" || tag_name == "subtitle";
+                tag_name == "text" || tag_name == "title" || tag_name == "subtitle"
             });
 
-            let item_value = node
-                .attribute("arg")
-                .ok_or(DashItemCreationError::XmlMissingData(String::from(
-                    r#"attribute "arg""#,
-                )))?;
+            let item_value = node.attribute("arg").ok_or_else(|| {
+                DashItemCreationError::XmlMissingData(String::from(r#"attribute "arg""#))
+            })?;
 
             let mut title_option: Option<&str> = None;
             let mut subtitle_option: Option<&str> = None;
@@ -99,19 +95,19 @@ impl DashItem {
             relevant_tags.for_each(|child| match child.tag_name().name() {
                 "title" => title_option = Some(child.text().unwrap()),
                 "subtitle" => {
-                    if child.attributes().len() == 0 {
+                    if child.attributes().is_empty() {
                         subtitle_option = Some(child.text().unwrap())
                     }
                 }
                 _ => {}
             });
 
-            let title = title_option.ok_or(DashItemCreationError::XmlMissingData(String::from(
-                "<title> node",
-            )))?;
-            let subtitle = subtitle_option.ok_or(DashItemCreationError::XmlMissingData(
-                String::from("<subtitle> node"),
-            ))?;
+            let title = title_option.ok_or_else(|| {
+                DashItemCreationError::XmlMissingData(String::from("<title> node"))
+            })?;
+            let subtitle = subtitle_option.ok_or_else(|| {
+                DashItemCreationError::XmlMissingData(String::from("<subtitle> node"))
+            })?;
 
             let item_title = format!("{}: {}", title, subtitle);
 
@@ -134,7 +130,7 @@ mod tests {
     use super::*;
 
     fn minify(xml: &str) -> String {
-        xml.split("\n")
+        xml.split('\n')
             .map(|line| line.trim())
             .collect::<Vec<&str>>()
             .join("")
