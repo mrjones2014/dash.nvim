@@ -39,5 +39,8 @@ jobs:
         args: --check .
         version: 0.10.1
 
-    - name: Run tests
-      run: make test
+  check-rust:
+    - name: Build Rust
+      run: make build-macos-x86
+    - name: Lint Rust
+      run: cargo clippy
