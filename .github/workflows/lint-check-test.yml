@@ -8,36 +8,49 @@ on:
 
 jobs:
   check-lua:
-    name: Luacheck, Stylua, and Lua Tests
+    name: Run Luacheck and Stylua
     runs-on: macos-11
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - uses: rhysd/action-setup-vim@v1
-      with:
-        neovim: true
-        version: v0.5.0
-
     - name: Setup 'lua'
       uses: leafo/gh-actions-lua@v8
       with:
         luaVersion: "5.1.5"
-
     - name: Setup 'luarocks'
       uses: leafo/gh-actions-luarocks@v4
-
-    - name: Run luacheck
+    - name: Run Luacheck
       run: |
         luarocks install luacheck
         luacheck .
-
-    - uses: actions/checkout@v2
-    - uses: JohnnyMorganz/stylua-action@1.0.0
+    - name: Run Stylua
+      uses: JohnnyMorganz/stylua-action@1.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         args: --check .
         version: 0.10.1
 
-    - name: Run tests
-      run: make test
+  check-rust:
+    name: Build Rust and Lint with Clippy
+    runs-on: macos-11
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build Rust
+        run: make build-macos-x86
+      - name: Lint Rust
+        run: make lint-rust
+
+  check-integration:
+    name: Run All Tests
+    runs-on: macos-11
+    steps:
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.5.1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run All Tests
+        run: make test

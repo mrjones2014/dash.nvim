@@ -1,60 +1,63 @@
-use mlua::prelude::*;
-use mlua::FromLua;
+use crate::constants;
 
-pub fn build_query(
-    lua: &Lua,
-    (search_text, buffer_type, bang, file_type_keywords_table): (String, String, bool, LuaTable),
-) -> Result<Vec<String>, LuaError> {
-    let mut queries = Vec::new();
-    if bang {
-        queries.push(search_text.to_string());
-        return Ok(queries);
+/// Given search text and the list of configured keywords for current buffer type,
+/// return the list of queries that should be run via the Dash.app CLI, with keywords
+/// prepended to the search text
+///
+/// # Arguments
+///
+/// - `search_text` - the search text typed by the user, to be used as the query
+/// - `configured_keywords` - the configured keywords for the current buffer type
+pub fn build_queries(search_text: String, configured_keywords: &[String]) -> Vec<String> {
+    if configured_keywords.is_empty() {
+        return vec![search_text];
     }
 
-    let file_type_keywords: LuaValue = if file_type_keywords_table
-        .contains_key(buffer_type.to_string())
-        .unwrap()
-    {
-        file_type_keywords_table
-            .get(buffer_type.to_string())
-            .unwrap()
-    } else {
-        mlua::Value::Boolean(false)
-    };
+    configured_keywords
+        .iter()
+        .map(|keyword| format!("{}:{}", keyword, search_text))
+        .collect()
+}
 
-    if file_type_keywords.type_name() == "boolean" {
-        if file_type_keywords.eq(&mlua::Value::Boolean(true)) {
-            queries.push(format!("{}:{}", buffer_type, search_text));
-            return Ok(queries);
-        }
-
-        // otherwise it's false, and filtering by the buffer type is disabled
-        queries.push(search_text.to_string());
-        return Ok(queries);
+/// Given a query in the form `keyword:rest of query`, parse the keyword out of it.
+/// If no keyword is present, returns an empty string.
+pub fn parse_keyword_or_default(query: &str) -> String {
+    if !constants::KEYWORD_PATTERN.is_match(query) {
+        return String::from("");
     }
 
-    if file_type_keywords.type_name() == "string" {
-        queries.push(format!(
-            "{}:{}",
-            LuaString::from_lua(file_type_keywords, lua)
-                .unwrap()
-                .to_str()
-                .unwrap(),
-            search_text
-        ));
-        return Ok(queries);
+    let captures = constants::KEYWORD_PATTERN.captures(query);
+    if captures.is_none() {
+        return String::from("");
     }
 
-    if file_type_keywords.type_name() == "table" {
-        let keywords_table: LuaTable = LuaTable::from_lua(file_type_keywords, lua).unwrap();
-        for pair in keywords_table.pairs::<Option<String>, String>().into_iter() {
-            queries.push(format!("{}:{}", pair.unwrap().1, search_text));
-        }
-
-        return Ok(queries);
+    let first_capture = captures.unwrap().get(1);
+    if first_capture.is_none() {
+        return String::from("");
     }
 
-    // if all else fails, just return the search_text as the only query
-    queries.push(search_text.to_string());
-    return Ok(queries);
+    String::from(first_capture.unwrap().as_str())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn when_configured_keywords_is_empty_then_returns_search_text() {
+        let queries = build_queries(String::from("search text"), &Vec::new());
+
+        assert_eq!(1, queries.len());
+        assert_eq!("search text", queries[0]);
+    }
+
+    #[test]
+    fn when_configured_keywords_is_not_empty_then_returns_search_text_prefixed_with_each_query() {
+        let keywords = vec![String::from("typescript"), String::from("javascript")];
+        let queries = build_queries(String::from("search text"), &keywords);
+
+        assert_eq!(2, queries.len());
+        assert_eq!("typescript:search text", queries[0]);
+        assert_eq!("javascript:search text", queries[1]);
+    }
 }
