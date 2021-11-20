@@ -40,7 +40,8 @@ jobs:
         version: 0.10.1
 
   check-rust:
-    - name: Build Rust
-      run: make build-macos-x86
-    - name: Lint Rust
-      run: cargo clippy -- -D warnings
+    steps:
+      - name: Build Rust
+        run: make build-macos-x86
+      - name: Lint Rust
+        run: cargo clippy -- -D warnings
