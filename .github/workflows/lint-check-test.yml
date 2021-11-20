@@ -44,7 +44,7 @@ jobs:
       - name: Build Rust
         run: make build-macos-x86
       - name: Lint Rust
-        run: cargo clippy -- -D warnings
+        run: make lint-rust
 
   check-integration:
     name: Run Lua Integration Tests

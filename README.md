@@ -306,16 +306,24 @@ Lua modules.
 
 ### Running Tests
 
+You can run all tests (both Rust and Lua) with `make test`.
+
+#### Lua Tests
+
 This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)) and [matcher_combinators](https://github.com/m00qek/matcher_combinators.lua) to
 define tests in `spec/` directory. These dependencies are required only to run
 tests, that's why they are installed as git submodules.
 
-To run tests, run `make test`. This runs tests in Neovim with a minimal profile,
+To run Lua tests, run `make test-lua`. This runs tests in Neovim with a minimal profile,
 [spec.vim](./spec/spec.vim). This runs Neovim with only this plugin, and the testing dependencies.
 
 If you have [entr(1)](https://eradman.com/entrproject/) installed, you can run the tests in watch mode
 using `make watch`.
+
+#### Rust Tests
+
+Rust tests use built-in Rust assertions and test modules. To run Rust tests, run `make test-rust`.
 
 ### Code Style
 
@@ -323,4 +331,5 @@ Use `snake_case` for everything. All Lua code should be checked and formatted wi
 presentation-layer code (such as providers for various fuzzy finder plugins) should be in the Lua code, any core
 functionality most likely belongs in the Rust backend.
 
-All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer).
+All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer),
+and linted using [clippy](https://github.com/rust-lang/rust-clippy), which can be run via `make lint-rust`.
