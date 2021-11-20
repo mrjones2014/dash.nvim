@@ -6,10 +6,12 @@ prepare:
 test-lua: build-macos-x86
 test-lua: install
 test-lua: prepare
+	@echo "Running Lua tests..."
 	@nvim --headless --noplugin -u spec/spec.vim -c "PlenaryBustedDirectory spec/ { minimal_init = 'spec/spec.vim' }"
 
 .PHONY: test-rust
 test-rust:
+	@echo "Running Rust tests..."
 	@cargo test
 
 .PHONY: test
