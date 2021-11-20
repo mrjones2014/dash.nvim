@@ -10,10 +10,13 @@ end
 local function build_producer(current_file_type, bang)
   return function(request)
     if not request or request.canceled() then
-      print('wtf')
       coroutine.yield(nil)
     elseif request.filter and #request.filter > 0 then
-      local results = require('libdash_nvim').query(request.filter, current_file_type, bang or false)
+      local results = require('libdash_nvim').query({
+        search_text = request.filter,
+        buffer_type = current_file_type,
+        ignore_keywords = bang or false,
+      })
       yield_results(results)
     else
       coroutine.yield({})
@@ -22,15 +25,21 @@ local function build_producer(current_file_type, bang)
 end
 
 local function handle_selected(selected)
-  require('libdash_nvim').open_item(selected)
+  local libdash = require('libdash_nvim')
+  if selected.is_fallback then
+    libdash.open_url(selected.value)
+  else
+    libdash.open_item(selected)
+  end
 end
 
-function M.dash(bang)
+function M.dash(params)
   local current_file_type = vim.bo.filetype
   return require('snap').run({
-    producer = build_producer(current_file_type, bang or false),
+    producer = build_producer(current_file_type, params.bang or false),
     select = handle_selected,
     prompt = 'Dash>',
+    filter = params.initial_text or '',
   })
 end
 

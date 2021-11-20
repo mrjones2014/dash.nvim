@@ -6,7 +6,11 @@ local function finder_fn(current_file_type, bang)
       return {}
     end
 
-    return require('libdash_nvim').query(prompt, current_file_type, bang)
+    return require('libdash_nvim').query({
+      search_text = prompt,
+      buffer_type = current_file_type,
+      ignore_keywords = bang,
+    })
   end
 end
 
@@ -21,7 +25,7 @@ local function attach_mappings(_, map)
     if not entry.is_fallback then
       libdash.open_item(entry)
     else
-      libdash.open_search_engine(entry.value)
+      libdash.open_url(entry.value)
     end
     require('telescope.actions').close(buffnr)
   end)

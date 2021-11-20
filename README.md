@@ -77,7 +77,9 @@ plugins installed will result in undefined behavior. You can use a specific fuzz
 
 If using Telescope, you can also run `:Telescope dash search` or `:Telescope dash search_no_filter`.
 
-If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`, for example.
+If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').dash({ bang = false, initial_text = '' })`.
+
+If using Snap, you can also run `:lua require('dash.providers.snap').dash({ bang = false, initial_text = '' })`.
 
 ## Configuration
 
@@ -94,7 +96,7 @@ If using fzf-lua, you can also run `:FzfLua dash` or `:lua require('fzf-lua').da
   -- map filetype strings to the keywords you've configured for docsets in Dash
   -- setting to false will disable filtering by filetype for that filetype
   -- filetypes not included in this table will not filter the query by filetype
-  -- check src/config.rs to see all defaults
+  -- check src/lua_bindings/dash_config_binding.rs to see all defaults
   -- the values you pass for file_type_keywords are merged with the defaults
   -- to disable filtering for all filetypes,
   -- set file_type_keywords = false
@@ -143,7 +145,7 @@ require('dash').setup({
 The public API consists of two main functions.
 
 ```lua
--- See src/config.rs for available config keys
+-- See src/lua_bindings/dash_config_binding.rs for available config keys
 -- Also described in configuration section below
 ---@param config
 require('dash').setup(config)
@@ -179,7 +181,7 @@ The Rust backend exports the following constants for use:
 ### `libdash_nvim.config` (table)
 
 This table stores the internal configuration. You can access it via `require('libdash_nvim').config`.
-See `src/config.rs` or [configuration](#configuration) above for configuration keys.
+See `src/lua_bindings/dash_config_binding.rs` or [configuration](#configuration) above for configuration keys.
 
 ### `libdash_nvim.default_config` (table)
 
@@ -193,7 +195,7 @@ to help with merging your custom config with the default config, but can be usef
 ### `libdash_nvim.setup` (function)
 
 This method is used to set the internal configuration of the backend. It takes a table, which will be
-**merged with the default configuration**. See `src/config.rs` or [configuration](#configuration) above
+**merged with the default configuration**. See `src/lua_bindings/dash_config_binding.rs` or [configuration](#configuration) above
 for configuration keys.
 
 ```lua
@@ -204,37 +206,44 @@ require('libdash_nvim').setup({
 
 ### `libdash_nvim.query` (function)
 
-This method (`require('libdash_nivm').query`) takes 3 arguments: the search text, the current buffer type,
-and a boolean indicating whether to disable filetype filtering (e.g. command was run with bang, `:Dash!`).
+This method takes a table as its argument. The table should have the following keys:
+
+- `search_text` - the search text entered by the user
+- `buffer_type` - the current buffer type, this will be used to determine filter keywords from config
+- `ignore_keywords` - disables filtering by keywords if true (e.g. if run with bang, `:Dash!` or `:DashWord!`)
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query(
-  'match arms',
-  'rust',
-  false
-)
+local results = libdash.query({
+  search_text = 'match arms',
+  buffer_type = 'rust',
+  ignore_keywords = false
+})
 ```
 
-The `query` method returns a table with the following properties:
+The `query` method returns a table list of tables (a Rust `Vec<DashItem>` serialized to a Lua table, see `src/dash_item.rs`)
+with the following properties:
 
-- `value` -- the number value of the item, to be used when selected. Running a query, then opening the URL `dash-workflow-callback://[value]` will open the selected item in Dash.app
-- `ordinal` -- a value to sort by, currently this is the same value as `display`
-- `display` -- a display value
-- `keyword` -- the keyword (if there was one) on the query that returned this result
-- `query` -- the full query that returned this result
+- `value` - the number value of the item, to be used when selected
+- `ordinal` - a value to sort by, currently this is the same value as `display`
+- `display` - a display value
+- `keyword` - the keyword (if there was one) on the query that returned this result
+- `query` - the full query that returned this result
+- `is_fallback` - indicates whether the item represents a search engine fallback and should be handled as such
 
-If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`. The table will look something like the following:
+If no items are returned from querying Dash, it will return a single item with an extra key, `is_fallback = true`.
+The table will look something like the following:
 
 ```lua
 {
-  value = 'https://duckduckgo.com/?q=array.prototype.filter',
+  value = 'https://duckduckgo.com/?q=rust match arms',
   ordinal = '1',
-  display = 'Search with DuckDuckGo: array.prototype.filter',
+  display = 'Search with DuckDuckGo: rust match arms',
+  keyword = 'rust',
+  query = 'rust:match arms',
   is_fallback = true,
 }
 ```
-
 
 ### `libdash_nvim.open_item` (function)
 
@@ -242,17 +251,24 @@ Takes an item returned from querying Dash via the `require('libdash_nvim').query
 
 ```lua
 local libdash = require('libdash_nvim')
-local results = libdash.query('match arms', 'rust', false)
+local results = libdash.query({
+  search_text = 'match arms',
+  buffer_type = 'rust',
+  ignore_keywords = false
+})
 local selected = results[1]
 require('libdash_nvim').open_item(selected)
 ```
 
-### `libdash_nvim.open_search_engine` (function)
+### `libdash_nvim.open_url` (function)
 
-Utility method to open a search engine URL when the fallback item is selected.
+Simply takes a URL string and opens it in the default browser/handler for the URL protocol. This is
+used for both opening the search engine fallback via an HTTPS URL, as well as opening the selected
+`DashItem` in Dash.app via the `dash-workflow-callback://` URL protocol.
 
 ```lua
-require('libdash_nvim').open_search_engine('https://duckduckgo.com/?q=array.prototype.filter')
+require('libdash_nvim').open_url('https://duckduckgo.com/?q=array.prototype.filter')
+require('libdash_nvim').open_url('dash-workflow-callback://5')
 ```
 
 ---
@@ -290,16 +306,24 @@ Lua modules.
 
 ### Running Tests
 
+You can run all tests (both Rust and Lua) with `make test`.
+
+#### Lua Tests
+
 This uses [busted](https://github.com/Olivine-Labs/busted), [luassert](https://github.com/Olivine-Labs/luassert) (both through
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)) and [matcher_combinators](https://github.com/m00qek/matcher_combinators.lua) to
 define tests in `spec/` directory. These dependencies are required only to run
 tests, that's why they are installed as git submodules.
 
-To run tests, run `make test`. This runs tests in Neovim with a minimal profile,
+To run Lua tests, run `make test-lua`. This runs tests in Neovim with a minimal profile,
 [spec.vim](./spec/spec.vim). This runs Neovim with only this plugin, and the testing dependencies.
 
 If you have [entr(1)](https://eradman.com/entrproject/) installed, you can run the tests in watch mode
 using `make watch`.
+
+#### Rust Tests
+
+Rust tests use built-in Rust assertions and test modules. To run Rust tests, run `make test-rust`.
 
 ### Code Style
 
@@ -307,4 +331,5 @@ Use `snake_case` for everything. All Lua code should be checked and formatted wi
 presentation-layer code (such as providers for various fuzzy finder plugins) should be in the Lua code, any core
 functionality most likely belongs in the Rust backend.
 
-All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer).
+All Rust code should be checked and formatted using [rust-analyzer](https://github.com/rust-analyzer/rust-analyzer),
+and linted using [clippy](https://github.com/rust-lang/rust-clippy), which can be run via `make lint-rust`.

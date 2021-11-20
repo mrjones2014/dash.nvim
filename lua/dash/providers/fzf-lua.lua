@@ -16,7 +16,7 @@ local function handle_selected(selected)
   local selected_item = matching_items[1]
   local libdash = require('libdash_nvim')
   if selected_item.is_fallback then
-    libdash.open_search_engine(selected_item.value)
+    libdash.open_url(selected_item.value)
   else
     libdash.open_item(selected_item)
   end
@@ -51,7 +51,11 @@ M.dash = function(opts)
       return {}
     end
 
-    cached_results = require('libdash_nvim').query(query, current_file_type, opts.bang or false)
+    cached_results = require('libdash_nvim').query({
+      search_text = query,
+      buffer_type = current_file_type,
+      ignore_keywords = opts.bang or false,
+    })
     local items = {}
     for _, item in pairs(cached_results) do
       table.insert(items, item.display)
