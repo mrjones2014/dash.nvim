@@ -37,7 +37,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Rust
-        run: make build-macos-x86
+        run: make build-local
       - name: Lint Rust
         run: make lint-rust
 
