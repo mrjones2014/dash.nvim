@@ -11,5 +11,5 @@ else
   cp ./bin/x86/libdash_nvim.so ./lua/
   mkdir -p ./lua/deps/
   cp -r ./bin/x86/deps/ ./lua/deps/
-  echo "Installed binary for Intel architecture"
+  echo "Installed binary for x86 architecture"
 fi
