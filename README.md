@@ -51,6 +51,15 @@ Vim-Plug:
 Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
 ```
 
+### Build From Source
+
+If you prefer not to trust the binaries hosted in the repository, you can build from source. This requires installing
+the latest stable Rust toolchain from [rustup.rs](https://rustup.rs). Once you have the Rust toolchain set up,
+you can clone this repository, and run `make build-local install`. `make build-local` will auto-detect the host
+machine's architecture and build for that target, and `make install` will copy the binaries into you Lua runtime
+path. Once you've done this, you can install into Neovim by pointing your plugin manager to the local repository
+path on disk instead of `mrjones2014/dash.nvim`.
+
 ## Usage
 
 <!-- panvimdoc-ignore-start -->
@@ -118,7 +127,7 @@ If using Snap, you can also run `:lua require('dash.providers.snap').dash({ bang
 }
 ```
 
-If you notice an issue with the default config or would like a new filetype added, please file an issue or submit a PR!
+If you notice an issue with the default config or would like a new file type added, please file an issue or submit a PR!
 
 ### With Telescope
 
@@ -303,6 +312,10 @@ There is also a `make dev` task which will set the `$DASH_NVIM_DEV` environment 
 When the `$DASH_NVIM_DEV` environment variable is set, there will be an extra command available, `:DashDevReload`.
 This will reload Telescope, fzf-lua, and Snap (whichever ones you have installed), as well as the `dash` and `libdash_nvim`
 Lua modules.
+
+To recompile the Rust backend for your machine's CPU architecture and install the module, run `make build-local install`.
+`make build-local` will auto-detect your machine's architecture and build for that target, and `make install` will copy
+the compiled binaries into your Lua runtime path.
 
 ### Running Tests
 
