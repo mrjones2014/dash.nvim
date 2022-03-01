@@ -42,7 +42,7 @@ fn get_effective_file_type_keywords(
         }
         "table" => {
             let keywords_table = LuaTable::from_lua(file_type_keywords_config, lua)?;
-            for pair in keywords_table.pairs::<Option<String>, String>().into_iter() {
+            for pair in keywords_table.pairs::<Option<String>, String>() {
                 let value = pair?.1;
                 file_type_keywords.push(value);
             }

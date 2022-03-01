@@ -122,7 +122,7 @@ pub fn setup<'a>(lua: &'a Lua, new_config: LuaTable) -> Result<LuaTable<'a>, Lua
         if keywords_config_value.type_name() == "table" {
             let keywords_config_table: LuaTable = config_table.get("file_type_keywords").unwrap();
             let keywords_table: LuaTable = LuaTable::from_lua(keywords_config_value, lua).unwrap();
-            for pair in keywords_table.pairs::<String, LuaValue>().into_iter() {
+            for pair in keywords_table.pairs::<String, LuaValue>() {
                 let unwrapped = pair.unwrap();
                 let keyword_key = unwrapped.0;
                 let keyword_value: LuaValue = unwrapped.1;

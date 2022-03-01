@@ -79,7 +79,7 @@ impl DashItem {
         let item_keyword = query_builder::parse_keyword_or_default(query);
 
         let mut dash_items: Vec<DashItem> = Vec::new();
-        for node in items_node.children().into_iter() {
+        for node in items_node.children() {
             let relevant_tags = node.children().filter(|child| {
                 let tag_name = child.tag_name().name();
                 tag_name == "text" || tag_name == "title" || tag_name == "subtitle"
@@ -173,7 +173,7 @@ mod tests {
 
         let items = DashItem::try_from_xml(valid_xml_str, "ignored");
 
-        assert_eq!(true, items.is_ok());
+        assert!(items.is_ok());
         assert_eq!(2, items.unwrap().len());
     }
 
@@ -214,7 +214,7 @@ mod tests {
 
         let items_result = DashItem::try_from_xml(valid_xml_str, "react:useState hook");
 
-        assert_eq!(true, items_result.is_ok());
+        assert!(items_result.is_ok());
         let items = items_result.unwrap();
         assert_eq!(2, items.len());
         assert_eq!("react", items[0].keyword);
@@ -224,14 +224,10 @@ mod tests {
     #[test]
     fn fails_when_invalid_xml() {
         let items_result = DashItem::try_from_xml(self::minify("invalid xml string"), "ignored");
-
-        let mut is_xml_parse_error = false;
-        match items_result.unwrap_err() {
-            DashItemCreationError::XmlParsingError(_) => is_xml_parse_error = true,
-            _ => {}
-        }
-
-        assert!(is_xml_parse_error);
+        assert!(matches!(
+            items_result,
+            Err(DashItemCreationError::XmlParsingError(_))
+        ));
     }
 
     #[test]

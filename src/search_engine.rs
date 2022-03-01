@@ -41,11 +41,7 @@ impl SearchEngine {
                 search_engine_query_str
             ),
         };
-        let title = format!(
-            "Search {} for: {}",
-            format!("{}", self),
-            search_engine_query_str
-        );
+        let title = format!("Search {} for: {}", self, search_engine_query_str);
 
         DashItem {
             value: url,
