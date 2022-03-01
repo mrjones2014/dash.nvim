@@ -23,4 +23,3 @@ unzip libdash.zip -d ./lua/
 mv "./lua/$DASH_UNZIP_DIR/deps/" ./lua/
 mv "./lua/$DASH_UNZIP_DIR/libdash_nvim.so" ./lua/
 rm -rf "./lua/$DASH_UNZIP_DIR"
-rm -rf libdash.zip

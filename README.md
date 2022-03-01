@@ -20,7 +20,7 @@ Note: Dash is a Mac-only app, so you'll only find this plugin useful on Mac.
 
 ## Install
 
-This plugin must be loaded *after* your fuzzy finder plugin of choice. Currently supported fuzzy finder plugins are:
+This plugin must be loaded _after_ your fuzzy finder plugin of choice. Currently supported fuzzy finder plugins are:
 
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 - [fzf-lua](https://github.com/ibhagwan/fzf-lua)
@@ -172,7 +172,6 @@ See [backend](#Backend) for documentation on the backend data provider.
 
 ## Backend
 
-The binaries for the Rust backend can be found under `bin/`, compiled for Mac M1 and Intel architectures.
 To build from source, you will need a Rust toolchain, which can be installed from [rustup.rs](https://rustup.rs).
 Once this is installed, you should be able to build via `make build`. Then, `make install` will copy the correct
 binary into the `lua/` directory so that it is added to Lua's runtimepath.
@@ -194,7 +193,7 @@ See `src/lua_bindings/dash_config_binding.rs` or [configuration](#configuration)
 
 ### `libdash_nvim.default_config` (table)
 
-This table stores the *default* configuration. **You should not modify this table, treat it as read-only.** This is mainly
+This table stores the _default_ configuration. **You should not modify this table, treat it as read-only.** This is mainly
 to help with merging your custom config with the default config, but can be useful for debugging purposes. For example:
 
 ```VimL

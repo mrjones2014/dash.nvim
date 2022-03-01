@@ -5,3 +5,4 @@ lua/deps/
 bin/
 *.rlib
 *.so
+vendor/

@@ -1,6 +1,10 @@
 .PHONY: prepare
 prepare:
-	@git submodule update --depth 1 --init
+	mkdir -p vendor
+	if test ! -d ./vendor/plenary.nvim; then git clone git@github.com:nvim-lua/plenary.nvim.git ./vendor/plenary.nvim/; fi
+	if test ! -d ./vendor/matcher_combinators.lua; then git clone git@github.com:m00qek/matcher_combinators.lua.git ./vendor/matcher_combinators.lua/; fi
+	pushd ./vendor/plenary.nvim/ && git pull && popd
+	pushd ./vendor/matcher_combinators.lua/ && git pull && popd
 
 .PHONY: test-lua
 test-lua: build-macos-x86
@@ -53,7 +57,6 @@ build: build-macos-x86
 install:
 	@./scripts/install-for-architecture.bash
 
-.PHONY: install-hooks
-install-hooks:
-	@git config core.hooksPath .githooks
-	@echo "Git hooks installed."
+.PHONY: install-local
+install-local:
+	@./scripts/install-local.bash
