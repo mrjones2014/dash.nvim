@@ -52,5 +52,15 @@ jobs:
           version: v0.5.1
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Checkout Plenary
+        uses: actions/checkout@v2
+        with:
+          repository: nvim-lua/plenary.nvim
+          path: vendor/plenary.nvim
+      - name: Checkout matcher_combinators.lua
+        uses: actions/checkout@v2
+        with:
+          repository: m00qek/matcher_combinators.lua
+          path: vendor/matcher_combinators.lua
       - name: Run All Tests
         run: make test
