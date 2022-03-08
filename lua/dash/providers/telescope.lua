@@ -44,7 +44,7 @@ function M.dash(opts)
     on_complete = {},
   })
 
-  local picker = Picker:new({
+  local picker_opts = require('telescope.themes').get_dropdown({
     prompt_title = require('dash.providers').build_picker_title(opts.bang or false),
     finder = finder,
     sorter = Sorter.get_generic_fuzzy_sorter(),
@@ -52,6 +52,8 @@ function M.dash(opts)
     attach_mappings = attach_mappings,
     default_text = opts.initial_text or '',
   })
+
+  local picker = Picker:new(picker_opts)
 
   picker:find()
 end
