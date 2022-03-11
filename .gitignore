@@ -6,3 +6,4 @@ bin/
 *.rlib
 *.so
 vendor/
+libdash.zip
