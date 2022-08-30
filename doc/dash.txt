@@ -3,15 +3,26 @@
 ==============================================================================
 Table of Contents                                     *dash-table-of-contents*
 
-1. Dash.nvim                                                  |dash-dash.nvim|
+1. Dash.nvim is looking for a maintainer!|dash-dash.nvim-is-looking-for-a-maintainer!|
+2. Dash.nvim                                                  |dash-dash.nvim|
   - Install                                                     |dash-install|
   - Usage                                                         |dash-usage|
   - Configuration                                         |dash-configuration|
   - Backend                                                     |dash-backend|
   - Contributing                                           |dash-contributing|
 
+<hr>
+
 ==============================================================================
-1. Dash.nvim                                                  *dash-dash.nvim*
+1. Dash.nvim is looking for a maintainer!*dash-dash.nvim-is-looking-for-a-maintainer!*
+
+I don’t use this plugin anymore and don’t have time to maintain it. If you
+are interested in maintaining this repo, please open an issue or discussion!
+
+<hr>
+
+==============================================================================
+2. Dash.nvim                                                  *dash-dash.nvim*
 
 Query Dash.app <https://kapeli.com/dash> within Neovim with your fuzzy finder!
 
