@@ -2,7 +2,7 @@
 
 # Dash.nvim is looking for a maintainer!
 
-I don't use this plugin anymore and don't have time to maintian it. If you are interested in maintaining this repo, please open an issue or discussion!
+I don't use this plugin anymore and don't have time to maintain it. If you are interested in maintaining this repo, please open an issue or discussion!
 
 <hr>
 
